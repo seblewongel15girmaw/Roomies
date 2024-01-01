@@ -1,18 +1,16 @@
-const express = require('express');
-const app = express();
+const express = require('express')
+require("dotenv").config()
+const houseRouter=require("./routes/houseRoute")
+const brokerRouter=require("./routes/brokerRoute")
+const sequelize = require('./config/dbConfig')
 
-app.use(express.json());
+const app = express()
+app.use(express.json())
+app.use("/house",houseRouter)
+app.use("/broker",brokerRouter)
 
-// User routes
-const userRoutes = require('./routes/userRoute');
-const brokerRoutes = require('./routes/brokerRoute');
-const guarantorRoutes = require('./routes/guarantorRoute');
+sequelize.sync();
 
-app.use('/api/users', userRoutes);
-app.use('/api/brokers', brokerRoutes);
-app.use('/api/guarantors', guarantorRoutes);
-
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(process.env.PORT, () => {
+    console.log("server started")
+})

@@ -1,13 +1,10 @@
-const express = require('express');
-const router = express.Router();
-const brokerController = require('../controllers/brokerController');
-const { validateBrokerRegistration } = require('../middlewares/brokerValidation');
+const express = require("express")
+const { viewProfile, createProfile, editProfile } = require("../controllers/brokerController")
 
-router.get('/', brokerController.getAllBrokers);
+const router = express.Router()
 
-router.post('/register', validateBrokerRegistration, brokerController.registerBroker);
+router.route("/getProfile/:id").get(viewProfile)
+router.route("/createProfile").post(createProfile)
+router.route("/editProfile/:id").put(editProfile)
 
-router.put('/:id', validateBrokerRegistration, brokerController.updateBroker);
-router.delete('/:id', brokerController.deleteBroker);
-
-module.exports = router;
+module.exports=router

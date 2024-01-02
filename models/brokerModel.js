@@ -26,6 +26,18 @@ class Broker {
       connection.release();
     }
   }
+
+
+  static async deleteBroker(brokerId) {
+    try {
+      const query = 'DELETE FROM brokers WHERE id = ?';
+      const connection = await pool.getConnection();
+      await connection.query(query, [brokerId]);
+      connection.release();
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = Broker;

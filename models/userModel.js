@@ -38,6 +38,18 @@ class User {
       connection.release();
     }
   }
+
+  static async deleteUser(userId) {
+    try {
+      const query = 'DELETE FROM users WHERE id = ?';
+      const connection = await pool.getConnection();
+      await connection.query(query, [userId]);
+      connection.release();
+    } catch (error) {
+      throw error;
+    }
+  }
+
 }
 
 module.exports = User;

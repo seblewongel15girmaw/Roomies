@@ -1,12 +1,11 @@
 const mysql = require("mysql2")
 const pool = require("../config/dbConfig")
 const Profile = require("../models/brokerProfileModel")
-const Broker = require("../models/brokerSignModel")
+const Broker = require("../models/brokerModel")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
-const cloudinary = require("cloudinary").v2
+const { cloudinary } = require("../config/cloudinary")
 require("dotenv").config()
-
 
 const signUp = async (req, res) => {
   try {
@@ -52,7 +51,7 @@ const signIn = async (req, res) => {
 const createProfile = async (req, res) => {
 
   try {
-    const result = await cloudinary.uploader.upload(req.file.path)
+    const result = await cloudinary.v2.uploader.upload(req.file.path)
     const { phoneNumber1, phoneNumber2, email, brokerProfilePic } = req.body
     const { brokerId } = req.user
     const profile = await Profile.create({

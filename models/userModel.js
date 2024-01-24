@@ -39,6 +39,26 @@ class User {
     }
   }
 
+
+  // for login
+  static getUserByUsername(username) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const connection = await pool.getConnection(); // Get a connection from the pool
+  
+        const query = 'SELECT * FROM users WHERE username = ?';
+        const [results] = await connection.query(query, [username]);
+  
+        connection.release(); // Release the connection back to the pool
+  
+        resolve(results[0] || null);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+
   static async deleteUser(userId) {
     try {
       const query = 'DELETE FROM users WHERE id = ?';

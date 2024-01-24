@@ -4,8 +4,6 @@ let decoded;
 const authenticate = (req, res, next) => {
 let token = req.headers.authorization;
 
- 
-
   if (token) {
     try {
       // console.log(process.env.SECRET_KEY);

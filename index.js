@@ -31,11 +31,14 @@ const userRoutes = require('./routes/userRoute');
 const brokerRoutes = require('./routes/brokerRoute');
 const guarantorRoutes = require('./routes/guarantorRoute');
 const chatRoutes = require('./routes/chatRoute');
+const houseRoutes = require('./routes/houseRoute');
 
 app.use('/api/users', userRoutes);
 app.use('/api/brokers', brokerRoutes);
 app.use('/api/guarantors', guarantorRoutes);
 app.use('/api', chatRoutes);
+app.use('/api/houses', houseRoutes);
+
 
 // const PORT = 3000;
 app.listen(process.env.APP_PORT, () => {

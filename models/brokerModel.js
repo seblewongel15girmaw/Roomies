@@ -84,4 +84,4 @@ class Broker {
 
 
 
-// module.exports = Broker;
+module.exports = Broker;

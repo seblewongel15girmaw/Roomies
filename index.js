@@ -36,6 +36,7 @@ const brokerRoutes = require('./routes/brokerRoute');
 const guarantorRoutes = require('./routes/guarantorRoute');
 const chatRoutes = require('./routes/chatRoute');
 const houseRoutes = require('./routes/houseRoute');
+const feedbackRoutes = require('./routes/feedbackRoute');
 
 
 app.use('/api/users', userRoutes);
@@ -43,6 +44,7 @@ app.use('/api/brokers', brokerRoutes);
 app.use('/api/guarantors', guarantorRoutes);
 app.use('/api', chatRoutes);
 app.use('/api/houses', houseRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
 
 

@@ -1,4 +1,5 @@
 
+
 const House = require('../models/houseModel');
 const pool = require('../config/dbConfig');
 

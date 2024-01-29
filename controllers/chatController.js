@@ -17,15 +17,16 @@ class ChatController {
 
   static async getChats(req, res) {
     try {
-      const { sender_id, receiver_id } = req.query;
-
-      const chats = await Chat.getChats(sender_id, receiver_id);
-
+      const { senderId, receiverId } = req.params; // Use req.params to get parameters from the URL
+  
+      const chats = await Chat.getChats(senderId, receiverId);
+  
       res.status(200).json({ chats });
     } catch (error) {
       console.error('Error retrieving chats:', error);
-      res.status(500).json({ error: 'Failed to retrieve chats', error: error.message  });
+      res.status(500).json({ error: 'Failed to retrieve chats', errorMessage: error.message });
     }
+  
   }
 
   // ...

@@ -4,8 +4,12 @@ const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 const app = express();
 const pool = require('./config/dbConfig');
+// const multer = require('multer');
 
 app.use(express.json());
+
+// Set up the multer middleware for handling file uploads
+// const upload = multer({ dest: 'uploads/' });
 
 
 const sessionStore = new MySQLStore(
@@ -33,11 +37,14 @@ const guarantorRoutes = require('./routes/guarantorRoute');
 const chatRoutes = require('./routes/chatRoute');
 const houseRoutes = require('./routes/houseRoute');
 
+
 app.use('/api/users', userRoutes);
 app.use('/api/brokers', brokerRoutes);
 app.use('/api/guarantors', guarantorRoutes);
 app.use('/api', chatRoutes);
 app.use('/api/houses', houseRoutes);
+
+
 
 
 // const PORT = 3000;

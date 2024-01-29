@@ -6,7 +6,7 @@ class Chat {
           const connection = await pool.getConnection();
     
           const query =
-            'INSERT INTO chat (sender_id, receiver_id, message, image) VALUES (?, ?, ?, ?)';
+            'INSERT INTO messages (sender_id, receiver_id, message, image) VALUES (?, ?, ?, ?)';
           const bindParams = [senderId, receiverId, message, image];
     
           // Check and replace undefined with null
@@ -29,7 +29,7 @@ class Chat {
     try {
       const connection = await pool.getConnection();
       console.log('senderId:', senderId);
-console.log('receiverId:', receiverId);
+      console.log('receiverId:', receiverId);
 
 
       const query =

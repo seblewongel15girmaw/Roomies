@@ -134,37 +134,38 @@ exports.registerBroker = async (req, res) => {
     }
 
 
-    exports.updateBroker = async (req, res) => {
+    
+};
+exports.updateBroker = async (req, res) => {
 
 
-        try {
+    try {
 
-            const bokerID = req.params.id;
-            const { full_name, username, email, password, gender, address, phone_number1, profile_pic, phone_number2, } = req.body;
+        const bokerID = req.params.id;
+        const { full_name, username, email, password, gender, address, phone_number1, profile_pic, phone_number2, } = req.body;
 
-            await Broker.updateBroker(bokerID, {
-                full_name, username, email, password, gender, address, phone_number1, profile_pic, phone_number2,
-            });
+        await Broker.updateBroker(bokerID, {
+            full_name, username, email, password, gender, address, phone_number1, profile_pic, phone_number2,
+        });
 
-            res.status(200).json({ message: 'Broker updated successfully' });
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Internal server error' });
-        }
-    };
-
-    exports.deleteBroker = async (req, res) => {
-        try {
-            const brokerId = req.params.id;
-            await Broker.deleteBroker(brokerId);
-
-            res.status(200).json({ message: 'Broker deleted successfully' });
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Internal server error' });
-        }
+        res.status(200).json({ message: 'Broker updated successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
+
+exports.deleteBroker = async (req, res) => {
+    try {
+        const brokerId = req.params.id;
+        await Broker.deleteBroker(brokerId);
+
+        res.status(200).json({ message: 'Broker deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
 
 
 

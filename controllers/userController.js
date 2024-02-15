@@ -1,9 +1,45 @@
+const { Sequelize } = require('sequelize');
 const User = require('../models/userModel');
 const pool = require('../config/dbConfig'); // Import the MySQL connection pool
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+// register User
+exports.registerUser = async (req, res) => {
+  try {
+    const { full_name, username, email, password } = req.body;
 
+    // Check if the username or email already exists in the database
+    const existingUser = await User.findOne({
+      where: {
+        [Sequelize.Op.or]: [{ username }, { email }]
+      }
+    });
+
+    if (existingUser) {
+      res.status(400).json({ message: 'Username or email already exists' });
+      return;
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const userData = {
+      full_name,
+      username,
+      email,
+      password: hashedPassword
+    };
+
+    const user = await User.create(userData);
+
+    res.status(201).json({ message: 'User registered successfully', userId: user.id });
+  } catch (error) {
+    console.error('Error registering user:', error);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+};
+
+// Login User
 exports.loginUser = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -38,38 +74,45 @@ exports.loginUser = async (req, res) => {
     res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 };
-exports.registerUser = async (req, res) => {
+
+// Create User Profile
+exports.createUserProfile = async (req, res) => {
   try {
-    const {
-      full_name, username, email, password, gender, age, budget, image, personal_id, bio, phone_number, address, job_status,
-    } = req.body;
+    const userId = req.params.id; // Assuming the user ID is passed as a route parameter
+    const {  gender, age, budget, image, personal_id, bio, phone_number, address, job_status, } = req.body;
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Find the user by ID
+    const user = await User.findByPk(userId);
 
-    const userData = {
-      full_name, username, email,
-      password: hashedPassword, gender, age, budget, image, personal_id, bio, phone_number, address, job_status,
-    };
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
 
-    const user = new User();
-    const userId = await user.createUser(userData);
+    // Update the user profile data
+    user.age = age;
+    user.budget = budget;
+    user.image = image;
+    user.gender = gender;
+    user.personal_id = personal_id;
+    user.bio = bio;
+    user.phone_number = phone_number;
+    user.address = address;
+    user.job_status = job_status;
+    await user.save(); // Save the updated user profile
 
-    res.status(201).json({ message: 'User registered successfully', userId });
+    res.status(200).json({ message: 'User profile created successfully' });
   } catch (error) {
-    console.error('Error registering user:', error);
-    res.status(500).json({ message: 'Internal server error', error: error.message });
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
+
+// get All Users
 exports.getAllUsers = async (req, res) => {
   try {
-    const query = 'SELECT * FROM users'; // Assuming your table name is "users"
-
-    const connection = await pool.getConnection(); // Get a connection from the pool
-
-    const [users] = await connection.query(query); // Execute the query
-
-    connection.release(); // Release the connection back to the pool
+    const users = await User.findAll();
 
     res.status(200).json(users);
   } catch (error) {
@@ -79,24 +122,13 @@ exports.getAllUsers = async (req, res) => {
 };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+// Update User Profile
 exports.updateUser = async (req, res) => {
   try {
     const userId = req.params.id;
-    const { full_name, username,email, password, gender, age, budget, image, personal_id, bio, phone_number, address, job_status } = req.body;
+    const { full_name, username, email, password, gender, age, budget, image, personal_id, bio, phone_number, address, job_status } = req.body;
 
-    await User.updateUser(userId, {
+    await User.update({
       full_name,
       username,
       email,
@@ -110,6 +142,10 @@ exports.updateUser = async (req, res) => {
       phone_number,
       address,
       job_status
+    }, {
+      where: {
+        id: userId
+      }
     });
 
     res.status(200).json({ message: 'User updated successfully' });
@@ -119,10 +155,16 @@ exports.updateUser = async (req, res) => {
   }
 };
 
+
+// Delete The created account
 exports.deleteUser = async (req, res) => {
   try {
     const userId = req.params.id;
-    await User.deleteUser(userId);
+    await User.destroy({
+      where: {
+        id: userId
+      }
+    });
 
     res.status(200).json({ message: 'User deleted successfully' });
   } catch (error) {

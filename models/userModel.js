@@ -1,75 +1,70 @@
-const pool = require('../config/dbConfig');
 
-class User {
-  async createUser(userData) {
-    const connection = await pool.getConnection();
 
-    try {
-      const {
-        full_name, username, email, password, gender, age, budget, image, personal_id, bio, phone_number, address, job_status,
-      } = userData;
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/dbConfig'); 
 
-      const query = 'INSERT INTO users (full_name, username, email, password, gender, age, budget, image, personal_id, bio, phone_number, address, job_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+const User = sequelize.define('User', {
+  full_name: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  username: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  gender: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  age: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  budget: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  image: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  personal_id: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  bio: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  phone_number: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  address: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  job_status: {
+    type: DataTypes.STRING,
+    allowNull: true
+  }
+});
 
-      const bindParams = [
-        full_name || null,
-        username || null,
-        email || null,
-        password || null,
-        gender || null,
-        age || null,
-        budget || null,
-        image || null,
-        personal_id || null,
-        bio || null,
-        phone_number || null,
-        address || null,
-        job_status || null,
-      ];
 
-      console.log('SQL Query:', query);
-      const [result] = await connection.execute(query, bindParams);
-
-      return result.insertId;
-    } catch (error) {
-      console.error('Error creating user:', error);
-      throw error;
-    } finally {
-      connection.release();
+User.getUserByUsername = async function (username) {
+  return User.findOne({
+    where: {
+      username: username
     }
-  }
-
-
-  // for login
-  static getUserByUsername(username) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const connection = await pool.getConnection(); // Get a connection from the pool
-  
-        const query = 'SELECT * FROM users WHERE username = ?';
-        const [results] = await connection.query(query, [username]);
-  
-        connection.release(); // Release the connection back to the pool
-  
-        resolve(results[0] || null);
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
-
-
-  static async deleteUser(userId) {
-    try {
-      const query = 'DELETE FROM users WHERE id = ?';
-      const connection = await pool.getConnection();
-      await connection.query(query, [userId]);
-      connection.release();
-    } catch (error) {
-      throw error;
-    }
-  }
-
-}
+  });
+};
 
 module.exports = User;

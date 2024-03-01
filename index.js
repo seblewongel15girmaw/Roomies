@@ -3,7 +3,7 @@ require("dotenv").config();
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 const app = express();
-const { Sequelize } = require('sequelize');
+const sequelize = require('./config/dbConfig.js');
 const pool = require('./config/dbConfig');
 // const multer = require('multer');
 
@@ -62,6 +62,16 @@ app.use('/api/feedback', feedbackRoutes);
 app.use('/api/house-images', HouseImageRoutes);
 
 
+async function syncDatabase() {
+  try {
+    await sequelize.sync();
+    console.log('Database synchronized.');
+  } catch (error) {
+    console.error('Error synchronizing database:', error);
+  }
+}
+
+syncDatabase();
 
 
 // const PORT = 3000;

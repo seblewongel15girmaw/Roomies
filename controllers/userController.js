@@ -1,4 +1,4 @@
-const { Sequelize } = require('sequelize');
+// const { Sequelize } = require('sequelize');
 const User = require('../models/userModel');
 const pool = require('../config/dbConfig'); // Import the MySQL connection pool
 const bcrypt = require('bcrypt');
@@ -79,7 +79,7 @@ exports.loginUser = async (req, res) => {
 exports.createUserProfile = async (req, res) => {
   try {
     const userId = req.params.id; // Assuming the user ID is passed as a route parameter
-    const {  gender, age, budget, image, personal_id, bio, phone_number, address, job_status, } = req.body;
+    const { gender, age, budget, image, personal_id, bio, phone_number, address, job_status, } = req.body;
 
     // Find the user by ID
     const user = await User.findByPk(userId);

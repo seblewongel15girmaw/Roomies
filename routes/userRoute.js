@@ -4,6 +4,20 @@ const router = express.Router();
 const UserController = require('../controllers/userController');
 const { validateUserRegistration } = require('../middlewares/userValidation');
 const authenticate = require('../middlewares/auth');
+const multer = require("multer")
+
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "./images")
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.originalname)
+    }
+})
+const upload = multer({ storage: storage });
+
+
 
 // Register a User 
 router.post('/register', UserController.registerUser);
@@ -13,15 +27,15 @@ router.post('/login', UserController.loginUser);
 
 
 // Create User Profile
-router.post('/:id/profile', authenticate,UserController.createUserProfile);
+router.post('/:id/profile',  upload.fields([{ name: 'image' }, { name: 'personal_id' }]) ,UserController.createUserProfile);
 
 // Get All Users
-router.get('/',authenticate, UserController.getAllUsers);
+router.get('/', UserController.getAllUsers);
 
 // Update User Profile
-router.put('/updated/:id',authenticate, UserController.updateUser);
+router.put('/updated/:id', UserController.updateUser);
 
 // Delete User
-router.delete('/:id', authenticate,UserController.deleteUser);
+router.delete('/:id', UserController.deleteUser);
 
 module.exports = router;

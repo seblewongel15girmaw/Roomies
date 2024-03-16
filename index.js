@@ -13,23 +13,24 @@ app.use(express.json());
 // const upload = multer({ dest: 'uploads/' });
 
 
-const sessionStore = new MySQLStore(
-  {
-    clearExpired: true,
-    checkExpirationInterval: 900000, // How often expired sessions should be cleared (in milliseconds)
-    expiration: 86400000, // The maximum age (in milliseconds) of a valid session
-  },
-  pool
-);
+// const sessionStore = new MySQLStore(
+//   {
+//     clearExpired: true,
+//     checkExpirationInterval: 900000, // How often expired sessions should be cleared (in milliseconds)
+//     expiration: 86400000, // The maximum age (in milliseconds) of a valid session
+//   },
+//   pool
+// );
 
 // Add session middleware
-app.use(
-  session({
-  secret: '4n339f8r4nD0m$tr!ng', // Replace with your own secret key
-  resave: false,
-  saveUninitialized: false,
-  store: sessionStore,
-}));
+
+// app.use(
+//   session({
+//   secret: '4n339f8r4nD0m$tr!ng', // Replace with your own secret key
+//   resave: false,
+//   saveUninitialized: false,
+//   store: sessionStore,
+// }));
 
 // CORS middleware
 

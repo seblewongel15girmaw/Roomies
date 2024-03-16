@@ -2,8 +2,9 @@ const User = require('../models/userModel');
 const pool = require('../config/dbConfig'); // Import the MySQL connection pool
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const {Sequelize} = require("sequelize")
-
+const { Sequelize } = require("sequelize")
+const path = require('path');
+const imagesDirectory = path.join(__dirname, "..", 'images');
 
 // register User
 exports.registerUser = async (req, res) => {
@@ -61,8 +62,8 @@ exports.loginUser = async (req, res) => {
       return;
     }
 
-     // Set the userId property in req.session after successful authentication
-     req.session.userId = user.id;
+    // Set the userId property in req.session after successful authentication
+    req.session.userId = user.id;
 
     // Generate a token with the user ID
     const token = jwt.sign({ userId: req.session.userId }, process.env.SECRET_KEY, { expiresIn: '1h' });
@@ -76,12 +77,20 @@ exports.loginUser = async (req, res) => {
   }
 };
 
+
+
+
 // Create User Profile
 exports.createUserProfile = async (req, res) => {
   try {
     const userId = req.params.id; // Assuming the user ID is passed as a route parameter
     const { gender, age, budget, image, personal_id, bio, phone_number, address, job_status, } = req.body;
-
+    const files = req.files;
+    if (!files || files.length === 0) {
+      return res.status(400).send("Files are missing");
+    }
+    const imagePath1 = path.join(imagesDirectory, files["image"][0].filename);
+    const imagePath2=path.join(imagesDirectory,files["personal_id"][0].filename)
     // Find the user by ID
     const user = await User.findByPk(userId);
 
@@ -93,9 +102,9 @@ exports.createUserProfile = async (req, res) => {
     // Update the user profile data
     user.age = age;
     user.budget = budget;
-    user.image = image;
+    user.image = imagePath1;
     user.gender = gender;
-    user.personal_id = personal_id;
+    user.personal_id = imagePath2;
     user.bio = bio;
     user.phone_number = phone_number;
     user.address = address;

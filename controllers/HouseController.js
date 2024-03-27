@@ -1,93 +1,154 @@
 
+const { House, Image } = require("../models/brokerModel")
+const cloudinary = require("cloudinary")
+const path = require("path")
+const imagesDirectory = path.join(__dirname, "..", 'images');
+const { Op } = require("sequelize")
 
-const House = require('../models/houseModel');
-const pool = require('../config/dbConfig');
+cloudinary.config({
+    cloud_name: "dqdhs44nq",
+    api_key: "544857432499217",
+    api_secret: "MYbbMctHshdYR_3ELvkDpJLQx8o"
+})
 
-// Get All House List
-exports.getAllHouse = async (req, res) => {
+
+const postHouse = async (req, res) => {
     try {
-    //   const query = 'SELECT * FROM houses'; // Assuming your table name is "houses"
-    const query = 'SELECT houses.*, brokers.full_name as broker_name FROM houses JOIN brokers ON houses.broker_id = brokers.id';
-  
-      const connection = await pool.getConnection(); // Get a connection from the pool
-  
-      const [brokers] = await connection.query(query); // Execute the query
-  
-      connection.release(); // Release the connection back to the pool
-  
-      res.status(200).json(brokers);
-    } catch (error) {
-      console.error('Error retrieving houses:', error);
-      res.status(500).json({ message: 'Internal server error', error: error.message });
-    }
-  };
+        const { brokerId } = req.user
+        const { location, price, description, numberOfRoom } = req.body
 
-// Create New House
-exports.registerHouse = async (req, res) => {
+        const house = await House.create({
+            location: location, numberOfRoom: numberOfRoom,
+            price: price, description: description, brokerId: brokerId,
+        })
+
+        const imagePaths = req.files.map(file => path.join(imagesDirectory, file.filename));
+        const createdImages = await Promise.all(
+            imagePaths.map(imageUrl => Image.create({ imageUrl, houseId: house.houseId }))
+        );
+        res.json({ "house": house, "images": createdImages })
+    }
+    catch (err) {
+        console.log(err)
+    }
+}
+
+
+const editHouse = async (req, res) => {
     try {
-      const {
-        broker_id, location, price, no_of_rooms, description,
-      } = req.body;
-  
-      const houseData = {
-        broker_id, location, price, no_of_rooms, description,
-      };
-  
-      const house = new House();
-      const houseId = await house.createHouse(houseData);
-  
-      res.status(201).json({ message: 'House registered successfully', houseId });
-    } catch (error) {
-      console.error('Error registering house:', error);
-      res.status(500).json({ message: 'Internal server error', error: error.message });
-    }
-  };
+        const { houseId } = req.params
+        const { numberOfRoom, description } = req.body
+        const isValid = checkOwnership(houseId)
+        if (isValid == false) {
+            return res.json("unauthorized access")
+        }
+        isValid.numberOfRoom = numberOfRoom
+        isValid.description = description
+        await isValid.save()
+        res.json(isValid)
 
-//   Show Specific House
-  exports.getHouseById = async (req, res) => {
+    }
+    catch (err) {
+        console.log(err)
+    }
+
+}
+
+const deleteHouse = async (req, res) => {
     try {
-      const houseId = req.params.id;
-      const house = await House.getHouseById(houseId);
-      
-      if (!house) {
-        return res.status(404).json({ message: 'House not found' });
-      }
-  
-      res.status(200).json(house);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Internal server error',error:error.message });
-    }
-  };
+        const { houseId } = req.params
+        const isValid = checkOwnership(houseId)
+        if (!isValid) {
+            return res.json("unauthorized access")
+        }
 
-//   Update the House Information
-  exports.updateHouse = async (req, res) => {
+        const house = await House.findByPk(houseId, {
+            include: Image
+        });
+
+        // Delete the house and associated images
+        await house.destroy();
+
+        res.json(isValid)
+
+    }
+    catch (err) {
+        console.log(err)
+    }
+
+}
+
+
+const checkOwnership = async (houseId) => {
     try {
-      const houseId = req.params.id;
-      const updatedHouseData = req.body;
-  
-      const updatedRowCount = await House.updateHouse(houseId, updatedHouseData);
-  
-      if (updatedRowCount === 0) {
-        return res.status(404).json({ message: 'House not found' });
-      }
-  
-      res.status(200).json({ message: 'House updated successfully' });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Internal server error', error: error.message });
+        const { brokerId } = req.user
+        const house = await House.findByPk(houseId)
+        if (house.brokerId != brokerId) {
+            return false
+        }
+        return house
     }
-  };
+    catch (err) {
+        console.log(err)
+    }
+}
 
-
-//   Delete the House
-  exports.deleteHouse = async (req, res) => {
+const viewSingleHouse = async (req, res) => {
     try {
-      const houseId = req.params.id;
-      await House.deleteHouse(houseId);
-      res.status(200).json({ message: 'House deleted successfully' });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Internal server error', error: error.message });
+        const { houseId } = req.params
+        const houseInfo = await House.findByPk(houseId, { include: Image })
+        res.json(houseInfo)
     }
-  };
+    catch (err) {
+        console.log(err)
+    }
+}
+
+const getAllHouses = async (req, res) => {
+    try {
+        const {result}=res.pagination
+        const { brokerId } = req.user
+        const sortBy=req.query.sortby || "price"
+        const { location, numberOfRoom, minPrice, maxPrice,  sortOrder } = req.query
+        const whereClause = {
+            brokerId: brokerId,
+            price: {
+                [Op.lte]: maxPrice || 10000,
+                [Op.gte]: minPrice || 100
+            }
+            // numberOfRoom: {
+            //     [Op.eq]: numberOfRoom || 5
+            // }
+        }
+
+        const order = sortBy ? [[sortBy, sortOrder || 'DESC']] : []
+        const houseList = await House.findAll({ where: whereClause, include: Image, order: order })
+        // console.log(result)
+        res.json(result)
+
+    }
+    catch (err) {
+        console.log(err)
+    }
+}
+
+const searchHouse = async (req, res) => {
+    const { brokerId } = req.user
+    const { location } = re.query
+    try {
+        const house = await House.findAll({
+            where: {
+                brokerId: brokerId,
+                location:
+                    { [Op.iLike]: `%${location}%` }
+            }
+        })
+        res.json(house)
+    }
+    catch (err) {
+        res.json(err)
+    }
+}
+
+module.exports = { postHouse, editHouse, deleteHouse, viewSingleHouse, getAllHouses,searchHouse }
+

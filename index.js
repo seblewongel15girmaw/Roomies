@@ -5,6 +5,7 @@ const MySQLStore = require('express-mysql-session')(session);
 const app = express();
 const sequelize = require('./config/dbConfig.js');
 const pool = require('./config/dbConfig');
+const associations=require("./models/association.js")
 // const multer = require('multer');
 
 app.use(express.json());
@@ -51,7 +52,7 @@ const guarantorRoutes = require('./routes/guarantorRoute');
 const chatRoutes = require('./routes/chatRoute');
 const houseRoutes = require('./routes/houseRoute');
 const feedbackRoutes = require('./routes/feedbackRoute');
-const HouseImageRoutes = require('./routes/houseImageRoute');
+// const HouseImageRoutes = require('./routes/houseImageRoute');
 
 
 app.use('/api/users', userRoutes);
@@ -60,7 +61,7 @@ app.use('/api/guarantors', guarantorRoutes);
 app.use('/api', chatRoutes);
 app.use('/api/houses', houseRoutes);
 app.use('/api/feedback', feedbackRoutes);
-app.use('/api/house-images', HouseImageRoutes);
+// app.use('/api/house-images', HouseImageRoutes);
 
 
 async function syncDatabase() {
@@ -73,6 +74,7 @@ async function syncDatabase() {
 }
 
 syncDatabase();
+associations();
 
 
 // const PORT = 3000;

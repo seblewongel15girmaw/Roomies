@@ -10,38 +10,6 @@ const associations=require("./models/association.js")
 
 app.use(express.json());
 
-// Set up the multer middleware for handling file uploads
-// const upload = multer({ dest: 'uploads/' });
-
-
-// const sessionStore = new MySQLStore(
-//   {
-//     clearExpired: true,
-//     checkExpirationInterval: 900000, // How often expired sessions should be cleared (in milliseconds)
-//     expiration: 86400000, // The maximum age (in milliseconds) of a valid session
-//   },
-//   pool
-// );
-
-// Add session middleware
-
-// app.use(
-//   session({
-//   secret: '4n339f8r4nD0m$tr!ng', // Replace with your own secret key
-//   resave: false,
-//   saveUninitialized: false,
-//   store: sessionStore,
-// }));
-
-// CORS middleware
-
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  next();
-});
-
 // Routes
 
 

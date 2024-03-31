@@ -1,28 +1,26 @@
-
 const { DataTypes } = require('sequelize');
 const sequelize = require("../config/dbConfig");
 
-
 const Broker = sequelize.define('Broker', {
-  brokerId: {
+  id: {
     type: DataTypes.INTEGER,
     allowNull: false,
     primaryKey: true,
     autoIncrement: true
   },
-  fullName: {
+  full_name: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  userName: {
+  username: {
     type: DataTypes.STRING,
     allowNull: false
   },
-  phoneNumber1: {
+  phone_number1: {
     type: DataTypes.BIGINT,
     allowNull: false
   },
-  phoneNumber2: {
+  phone_number2: {
     type: DataTypes.BIGINT,
     allowNull: true
   },
@@ -30,7 +28,7 @@ const Broker = sequelize.define('Broker', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  brokerProfilePic: {
+  profile_pic: {
     type: DataTypes.STRING,
     allowNull: false
   },
@@ -38,9 +36,6 @@ const Broker = sequelize.define('Broker', {
     type: DataTypes.STRING,
     allowNull: false
   }
-
 });
-
-
 
 module.exports = Broker;

@@ -27,15 +27,15 @@ router.post('/login', UserController.loginUser);
 
 
 // Create User Profile
-router.post('/:id/profile',  upload.fields([{ name: 'image' }, { name: 'personal_id' }]) ,UserController.createUserProfile);
+router.post('/:id/profile', authenticate, upload.fields([{ name: 'image' }, { name: 'personal_id' }]) ,UserController.createUserProfile);
 
 // Get All Users
-router.get('/', UserController.getAllUsers);
+router.get('/', authenticate,UserController.getAllUsers);
 
 // Update User Profile
-router.put('/updated/:id', UserController.updateUser);
+router.put('/updated/:id',authenticate, UserController.updateUser);
 
 // Delete User
-router.delete('/:id', UserController.deleteUser);
+router.delete('/:id',authenticate, UserController.deleteUser);
 
 module.exports = router;

@@ -5,7 +5,7 @@
 // const brokerController = require('../controllers/brokerController');
 // const { validateBrokerRegistration } = require('../middlewares/brokerValidation');
 
-// router.get('/', brokerController.getAllBrokers);
+
 
 // router.post('/register', validateBrokerRegistration, brokerController.registerBroker);
 
@@ -17,7 +17,7 @@
 
 const express = require("express")
 const multer=require("multer")
-const { viewProfile, createProfile, editProfile, signUp, signIn } = require("../controllers/brokerController")
+const { viewProfile, createProfile, editProfile, signUp, signIn ,getAllBrokers} = require("../controllers/brokerController")
 const router = express.Router()
 
 
@@ -31,6 +31,8 @@ const storage = multer.diskStorage({
 })
 const upload = multer({ storage: storage });
 
+// get all brokers
+router.route("/").get(getAllBrokers);
 
 router.route("/signup").post(signUp)
 router.route("/login").post(signIn)

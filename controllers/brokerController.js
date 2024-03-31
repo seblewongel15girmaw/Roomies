@@ -1,6 +1,7 @@
 
 const mysql = require("mysql2")
-const { Broker, BrokerProfile } = require("../models/brokerModel")
+// const { Broker, BrokerProfile } = require("../models/brokerModel")
+const Broker = require("../models/brokerModel")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 const cloudinary = require("cloudinary").v2
@@ -87,6 +88,17 @@ const createProfile = async (req, res) => {
     }
 };
 
+// get all Brokers
+const getAllBrokers = async (req, res) => {
+    try {
+      const brokers = await Broker.findAll();
+      res.json(brokers);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: err.message });
+    }
+  };
+
 
 const getBrokerProfile = async (req, res) => {
     const { brokerId } = req.user
@@ -95,10 +107,10 @@ const getBrokerProfile = async (req, res) => {
     res.json(brokerProfile)
 }
 
-const getAllBrokers = async (req, res) => {
-    const brokers = await BrokerProfile.findAll()
-    res.json(brokers)
-}
+// const getAllBrokers = async (req, res) => {
+//     const brokers = await Broker.findAll()
+//     res.json(brokers)
+// }
 
 
 const uploadImageToCloudinary = (imageBuffer) => {

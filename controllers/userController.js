@@ -62,11 +62,8 @@ exports.loginUser = async (req, res) => {
       return;
     }
 
-    // Set the userId property in req.session after successful authentication
-    req.session.userId = user.id;
-
     // Generate a token with the user ID
-    const token = jwt.sign({ userId: req.session.userId }, process.env.SECRET_KEY, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY, { expiresIn: '1h' });
     // console.log(token);
 
     res.status(200).json({ message: 'User logged in successfully', token });

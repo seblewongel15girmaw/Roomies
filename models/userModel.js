@@ -24,6 +24,10 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true
   },
+  religion: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   age: {
     type: DataTypes.INTEGER,
     allowNull: true
@@ -49,7 +53,7 @@ const User = sequelize.define('User', {
     allowNull: true
   },
   address: {
-    type: DataTypes.STRING,
+    type: DataTypes.JSON,
     allowNull: true
   },
   job_status: {

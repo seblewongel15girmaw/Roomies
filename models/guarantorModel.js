@@ -5,7 +5,7 @@ const {DataTypes}= require("sequelize")
 const Guarantor = sequelize.define("Guarantor", {
   guarantorId: {
     type: DataTypes.INTEGER,
-    unique:True
+    unique:true
   },
   full_name: {
     type: DataTypes.STRING,
@@ -24,7 +24,7 @@ const Guarantor = sequelize.define("Guarantor", {
     allowNull:false
   },
   gender: {
-    type: DataTypes.STRING,
+    type: DataTypes.ENUM("female", "male"),
     allowNull:false
   }
 })

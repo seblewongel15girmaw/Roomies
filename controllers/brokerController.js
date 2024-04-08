@@ -32,7 +32,7 @@ const signIn = async (req, res) => {
     try {
         const { password, username } = req.body
         const brokerInfo = await Broker.findOne({ username: username })
-        if (!brokerInfo) {
+        if (brokerInfo== null) {
             return res.json("user not found")
         }
         const compare = bcrypt.compare(password, brokerInfo.password)

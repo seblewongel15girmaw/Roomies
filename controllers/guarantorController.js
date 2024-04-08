@@ -1,5 +1,4 @@
 
-const pool = require('../config/dbConfig'); // Import the MySQL connection pool
 const Guarantor = require('../models/guarantorModel');
 
 exports.getAllGuarantor = async (req, res) => {

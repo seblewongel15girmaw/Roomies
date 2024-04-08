@@ -1,4 +1,3 @@
-
 const mysql = require("mysql2")
 // const { Broker, BrokerProfile } = require("../models/brokerModel")
 const Broker = require("../models/brokerModel")

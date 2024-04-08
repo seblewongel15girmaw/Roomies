@@ -1,43 +1,33 @@
 
-const pool = require('../config/dbConfig');
+const sequelize = require("../config/dbConfig")
+const {DataTypes}= require("sequelize")
 
-class Guarantor {
-    async createGuarantor(guarantorData) {
-      const connection = await pool.getConnection();
+const Guarantor = sequelize.define("Guarantor", {
+  guarantorId: {
+    type: DataTypes.INTEGER,
+    unique:True
+  },
+  full_name: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  personal_id: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  address: {
+    type: DataTypes.STRING,
+    allowNull:false
+  },
+  phone_number: {
+    type: DataTypes.STRING,
+    allowNull:false
+  },
+  gender: {
+    type: DataTypes.STRING,
+    allowNull:false
+  }
+})
   
-      try {
-        const {
-            full_name, user_id, personal_id_image, address, phone_number, gender
-        } = guarantorData;
-  
-        const query = 'INSERT INTO guarantors (full_name, user_id, personal_id_image, address, phone_number, gender) VALUES (?, ?, ?, ?, ?, ?)';
-        const bindParams = [
-            full_name, user_id, personal_id_image, address, phone_number, gender
-        ];
-  
-        console.log('SQL Query:', query);
-        const [result] = await connection.execute(query, bindParams);
-  
-        return result.insertId;
-      } catch (error) {
-        console.error('Error creating guarantor:', error);
-        throw error;
-      } finally {
-        connection.release();
-      }
-    }
-
-    static async deleteGuarantor(guarantorId) {
-      try {
-        const query = 'DELETE FROM guarantors WHERE id = ?';
-        const connection = await pool.getConnection();
-        await connection.query(query, [guarantorId]);
-        connection.release();
-      } catch (error) {
-        throw error;
-      }
-    }
-}
-
 
 module.exports = Guarantor;

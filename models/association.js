@@ -1,5 +1,7 @@
 const { House, Image } = require('./houseModel');
-const Broker = require("./brokerModel")
+const Broker = require("./brokerModel");
+const Guarantor = require('./guarantorModel');
+const User = require('./userModel');
 
 
 const setAssociations = function() {
@@ -8,7 +10,10 @@ House.belongsTo(Broker, { foreignKey: 'brokerId' });
 
 
 House.hasMany(Image, { foreignKey: 'houseId', onDelete: 'CASCADE' } );
-Image.belongsTo(House, { foreignKey: "houseId" })
+Image.belongsTo(House, { foreignKey: "houseId" });
+    
+User.hasOne(Guarantor, {foreignKey:"userId", onDelete:"CASCADE"})
+Guarantor.belongsTo(User, {foreignKey: "userId"})
  }
 module.exports = setAssociations;
  

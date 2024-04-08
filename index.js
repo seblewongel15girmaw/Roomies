@@ -1,14 +1,22 @@
 const express = require('express');
 require("dotenv").config();
-const session = require('express-session');
-const MySQLStore = require('express-mysql-session')(session);
 const app = express();
 const sequelize = require('./config/dbConfig.js');
-const pool = require('./config/dbConfig');
-const associations=require("./models/association.js")
+const associations = require("./models/association.js")
+const socketIo=require("socket.io")
+const http = require("http")
+const cors = require("cors")
 // const multer = require('multer');
 
+const server = http.createServer(app)
+const io = socketIo(server, {
+  cors: {
+    origin:"*"
+  }
+})
+
 app.use(express.json());
+app.use(cors());
 
 // Routes
 
@@ -44,8 +52,21 @@ async function syncDatabase() {
 syncDatabase();
 associations();
 
+//run when a client connect
+
+var clients = {}
+
+io.on("connection", socket => {
+  console.log("new connection")
+  // console.log(socket.id)
+  // socket.on(event, msg => {
+  //   console.log(msg)
+  // })
+})
+
+
 
 // const PORT = 3000;
-app.listen(process.env.APP_PORT, () => {
+server.listen(process.env.APP_PORT, () => {
   console.log(`Server running on port ${process.env.APP_PORT}`);
 });

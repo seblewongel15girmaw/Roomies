@@ -81,7 +81,7 @@ exports.loginUser = async (req, res) => {
 exports.createUserProfile = async (req, res) => {
   try {
     const userId = req.params.id; // Assuming the user ID is passed as a route parameter
-    const { gender, age, budget, image, personal_id, bio, phone_number, address, job_status, } = req.body;
+    const { gender,religion, age, budget, image, personal_id, bio, phone_number, address, job_status,smoking,pets,chores,privacy,religious_compatibility} = req.body;
     const files = req.files;
     if (!files || files.length === 0) {
       return res.status(400).send("Files are missing");
@@ -101,11 +101,17 @@ exports.createUserProfile = async (req, res) => {
     user.budget = budget;
     user.image = imagePath1;
     user.gender = gender;
+    user.religion = religion;
     user.personal_id = imagePath2;
     user.bio = bio;
     user.phone_number = phone_number;
-    user.address = address;
+    user.address = { latitude, longitude };
     user.job_status = job_status;
+    user.smoking = smoking;
+    user.pets = pets;
+    user.chores = chores;
+    user.privacy = privacy;
+    user.religious_compatibility = religious_compatibility;
     await user.save(); // Save the updated user profile
 
     res.status(200).json({ message: 'User profile created successfully' });
@@ -141,6 +147,7 @@ exports.updateUser = async (req, res) => {
       email,
       password,
       gender,
+      religion,
       age,
       budget,
       image,
@@ -148,7 +155,11 @@ exports.updateUser = async (req, res) => {
       bio,
       phone_number,
       address,
-      job_status
+      job_status,
+      chores,
+      smoking,
+      
+    
     }, {
       where: {
         id: userId

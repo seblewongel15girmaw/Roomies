@@ -1,7 +1,7 @@
 const mysql = require("mysql2")
-// const { Broker, BrokerProfile } = require("../models/brokerModel")
 const Broker = require("../models/brokerModel")
 const bcrypt = require("bcrypt")
+const nodemailer = require('nodemailer');
 const jwt = require("jsonwebtoken")
 const cloudinary = require("cloudinary").v2
 require("dotenv").config()
@@ -16,18 +16,87 @@ cloudinary.config({
 })
 
 
-const signUp = async (req, res) => {
-    try {
-        const { password } = req.body
-        const hashed = await bcrypt.hash(password, 10)
-        const broker = await Broker.create({ ...req.body, password: hashed })
-        res.json(broker)
-    }
-    catch (err) {
-        console.log(err)
-    }
-}
+// const signUp = async (req, res) => {
+//     try {
+//         const { password } = req.body
+//         const hashed = await bcrypt.hash(password, 10)
+//         const broker = await Broker.create({ ...req.body, password: hashed })
+//         res.json(broker)
+//     }
+//     catch (err) {
+//         console.log(err)
+//     }
+// }
 
+// Function to generate a random password
+function generatePassword() {
+    const length = 8;
+    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let password = '';
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * charset.length);
+      password += charset[randomIndex];
+    }
+    console.log('Generated Password:', password);
+    return password;
+  }
+  
+  
+  // Function to register a new broker
+  async function signUp(req, res) {
+    try {
+      // Generate a random password
+      const password = generatePassword();
+  
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10);
+  
+      // Create a new broker record in the database
+      const createdBroker = await Broker.create({
+        full_name: req.body.full_name,
+        username: req.body.username,
+        phone_number1: req.body.phone_number1,
+        phone_number2: req.body.phone_number2,
+        password: hashedPassword,
+        address: req.body.address,
+        gender: req.body.gender,
+        email: req.body.email // Assuming you have added the 'email' field to your model
+      });
+  
+     
+
+      const transporter = nodemailer.createTransport({
+        host: 'smtp.ethereal.email',
+        port: 587,
+        auth: {
+            user: 'rosalinda.hegmann@ethereal.email',
+            pass: '6ADrJThKnKJenGPf6V'
+        }
+    });
+
+    
+  
+      const mailOptions = {
+        from: 'seblina1224@gmail.com',
+        to: createdBroker.email, // Send the email to the broker's registered email address
+        subject: 'Account Registration',
+        text: `Your account has been registered. Your password is: ${password}`
+      };
+  
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.log('Error occurred:', error);
+          res.status(500).json({ message: 'Failed to send email' });
+        } else {
+          console.log('Email sent successfully!');
+          res.status(201).json({ message: 'Broker registered successfully!' });
+        }
+      });
+    } catch (error) {
+      console.error('Error occurred:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
 const signIn = async (req, res) => {
     try {
         const { password, username } = req.body
@@ -65,11 +134,6 @@ const createProfile = async (req, res) => {
         if (!files || files.length === 0) {
             return res.status(400).send("Files are missing");
         }
-        // const imageUrls = await cloudinary.uploader.upload(files.path);
-        // if (!imageUrls || imageUrls.length === 0) {
-        //     return res.status(500).send("Error uploading images to Cloudinary");
-        // }
-        // console.log(imageUrls)
         const imagePath = path.join(imagesDirectory, files.filename);
         const { phoneNumber1, email } = req.body;
         const { brokerId } = req.user

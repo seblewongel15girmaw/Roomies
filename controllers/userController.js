@@ -1,5 +1,5 @@
 const User = require('../models/userModel');
-const pool = require('../config/dbConfig'); // Import the MySQL connection pool
+// const pool = require('../config/dbConfig'); // Import the MySQL connection pool
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { Sequelize } = require("sequelize")

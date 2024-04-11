@@ -22,12 +22,14 @@ app.use(cors());
 
 
 // User routes
+
 const userRoutes = require('./routes/userRoute');
 const brokerRoutes = require('./routes/brokerRoute');
 const guarantorRoutes = require('./routes/guarantorRoute');
 const chatRoutes = require('./routes/chatRoute');
 const houseRoutes = require('./routes/houseRoute');
 const feedbackRoutes = require('./routes/feedbackRoute');
+const adminRoutes = require('./routes/adminRoute');
 // const HouseImageRoutes = require('./routes/houseImageRoute');
 
 
@@ -37,6 +39,7 @@ app.use('/api/guarantors', guarantorRoutes);
 app.use('/api', chatRoutes);
 app.use('/api/houses', houseRoutes);
 app.use('/api/feedback', feedbackRoutes);
+app.use('/api/admin', adminRoutes);
 // app.use('/api/house-images', HouseImageRoutes);
 
 

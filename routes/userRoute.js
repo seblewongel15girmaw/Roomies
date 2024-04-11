@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const UserController = require('../controllers/userController');
-const { validateUserRegistration } = require('../middlewares/userValidation');
+// const { validateUserRegistration } = require('../middlewares/userValidation');
 const authenticate = require('../middlewares/auth');
 const multer = require("multer")
 

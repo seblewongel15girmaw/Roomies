@@ -59,6 +59,27 @@ const User = sequelize.define('User', {
   job_status: {
     type: DataTypes.STRING,
     allowNull: true
+  },
+  smoking: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+   pets: {
+    type: DataTypes.STRING,
+    allowNull: true
+  } ,
+  privacy: {
+    type: DataTypes.STRING,
+    allowNull: true
+  } ,
+  religious_compatibility: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  
+  socialize: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 });
 

@@ -29,7 +29,7 @@ router.post('/login', UserController.loginUser);
 router.post('/:id/profile', authenticate, upload.fields([{ name: 'image' }, { name: 'personal_id' }]) ,UserController.createUserProfile);
 
 // Get All Users
-router.get('/', authenticate,UserController.getAllUsers);
+router.get('/', UserController.getAllUsers);
 
 // Update User Profile
 router.put('/updated/:id',authenticate, UserController.updateUser);

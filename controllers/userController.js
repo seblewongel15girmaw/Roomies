@@ -81,7 +81,7 @@ exports.loginUser = async (req, res) => {
 exports.createUserProfile = async (req, res) => {
   try {
     const userId = req.params.id; // Assuming the user ID is passed as a route parameter
-    const { gender,religion, age, budget, image, personal_id, bio, phone_number, address, job_status,smoking,pets,chores,privacy,religious_compatibility} = req.body;
+    const { gender,religion, age, budget, image, personal_id, bio, phone_number, address, job_status,smoking,pets,privacy,religious_compatibility,socialize} = req.body;
     const files = req.files;
     if (!files || files.length === 0) {
       return res.status(400).send("Files are missing");
@@ -109,9 +109,10 @@ exports.createUserProfile = async (req, res) => {
     user.job_status = job_status;
     user.smoking = smoking;
     user.pets = pets;
-    user.chores = chores;
+    // user.chores = chores;
     user.privacy = privacy;
     user.religious_compatibility = religious_compatibility;
+    user.socialize=socialize;
     await user.save(); // Save the updated user profile
 
     res.status(200).json({ message: 'User profile created successfully' });

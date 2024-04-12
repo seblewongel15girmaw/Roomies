@@ -74,8 +74,6 @@ function generatePassword() {
         }
     });
 
-    
-  
       const mailOptions = {
         from: 'seblina1224@gmail.com',
         to: createdBroker.email, // Send the email to the broker's registered email address

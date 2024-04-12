@@ -15,17 +15,18 @@ const getAllGuarantor = async (req, res) => {
 
 // function that registor guarantors
 const registerGuarantor = async (req, res) => {
-    try {
+  try {
+    var image_url
+      // accept the user id from the token then store 
       const {
-        full_name, user_id, address, phone_number, gender,
+        full_name, address, phone_number, gender
       } = req.body;
-
+    if (req.file) {
       const file = req.file;
-      const image_url=path.join(imagesDirectory, file["gurantor_id"].filename)
-
-  
+     image_url=path.join(imagesDirectory, file.filename)
+    }
       const guarantorData = {
-        full_name, user_id, personal_id_image:image_url|| null, address, phone_number, gender
+        full_name,personal_id:image_url, address, phone_number, gender
       };
   
       const guarantorID = await Guarantor.create(guarantorData);

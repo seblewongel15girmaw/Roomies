@@ -11,6 +11,8 @@ router.route("/gethousedetail/:id").get(viewSingleHouse)
 
 module.exports = router
 
+
+
 // const express = require('express');
 // const router = express.Router();
 // const houseController = require('../controllers/HouseController');

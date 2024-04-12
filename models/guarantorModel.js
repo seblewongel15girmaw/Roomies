@@ -3,17 +3,14 @@ const sequelize = require("../config/dbConfig")
 const {DataTypes}= require("sequelize")
 
 const Guarantor = sequelize.define("Guarantor", {
-  guarantorId: {
-    type: DataTypes.INTEGER,
-    unique:true
-  },
   full_name: {
     type: DataTypes.STRING,
     allowNull: false
   },
   personal_id: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true,
+    defaultValue:""
   },
   address: {
     type: DataTypes.STRING,
@@ -29,5 +26,4 @@ const Guarantor = sequelize.define("Guarantor", {
   }
 })
   
-
 module.exports = Guarantor;

@@ -39,6 +39,39 @@ exports.registerAdmin = async (req, res) => {
     }
   };
 
+  // login admins
+  
+  exports.loginAdmin = async (req, res) => {
+    try {
+      const { email, password } = req.body;
+  
+      // Retrieve the admin from the database
+      const admin = await Admin.getAdminByEmail(email);
+  
+      if (!admin) {
+        res.status(401).json({ message: 'Invalid email or password' });
+        return;
+      }
+  
+      // Compare the hashed password
+      const isMatch = await bcrypt.compare(password, admin.password);
+  
+      if (!isMatch) {
+        res.status(401).json({ message: 'Invalid email or password' });
+        return;
+      }
+  
+      // Generate a token with the admin ID
+      const token = jwt.sign({ adminId: admin.id }, process.env.SECRET_KEY, { expiresIn: '1h' });
+  
+      res.status(200).json({ message: 'Admin logged in successfully', token });
+  
+    } catch (error) {
+      console.error('Error logging in admin:', error);
+      res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+  };
+
 
   // get all admins
   exports.getAllAdmins = async (req, res) => {
@@ -51,3 +84,40 @@ exports.registerAdmin = async (req, res) => {
       res.status(500).json({ message: 'Internal server error', error: error.message });
     }
   };
+
+  // Logout admin
+// Logout admin
+exports.logoutAdmin = async (req, res) => {
+  try {
+    const { authorization } = req.headers;
+
+    // Extract the token from the Authorization header
+    const token = authorization.split(' ')[1];
+
+    if (!token) {
+      res.status(401).json({ message: 'No token provided' });
+      return;
+    }
+
+    // Verify the token
+    jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
+      if (err) {
+        res.status(401).json({ message: 'Invalid token' });
+        return;
+      }
+
+      // Perform any necessary cleanup or additional logic for admin
+
+      // Example: Update admin's last logout time
+      const adminId = decoded.adminId;
+      const admin = // Retrieve the admin from your database using the adminId
+      admin.lastLogout = new Date();
+      admin.save();
+
+      res.status(200).json({ message: 'Admin logged out successfully' });
+    });
+  } catch (error) {
+    console.error('Error logging out admin:', error);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+};

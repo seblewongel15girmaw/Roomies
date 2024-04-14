@@ -32,6 +32,12 @@ const Admin = sequelize.define('Admin', {
 });
 
 
-
+Admin.getAdminByEmail = async function (email) {
+  return Admin.findOne({
+    where: {
+      email: email
+    }
+  });
+};
 
 module.exports = Admin;

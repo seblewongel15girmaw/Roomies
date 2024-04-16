@@ -104,7 +104,7 @@ exports.createUserProfile = async (req, res) => {
     user.personal_id = imagePath2;
     user.bio = bio;
     user.phone_number = phone_number;
-    user.address = { latitude, longitude };
+    user.address =address;
     user.job_status = job_status;
     user.smoking = smoking;
     user.pets = pets;

@@ -65,17 +65,19 @@ function generatePassword() {
   
      
 
-      const transporter = nodemailer.createTransport({
-        host: 'smtp.ethereal.email',
-        port: 587,
+    
+
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        secure:'true',
         auth: {
-            user: 'rosalinda.hegmann@ethereal.email',
-            pass: '6ADrJThKnKJenGPf6V'
-        }
-    });
+          user: process.env.EMAIL_USERNAME,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+      });
 
       const mailOptions = {
-        from: 'seblina1224@gmail.com',
+        from: process.env.EMAIL_USERNAME,
         to: createdBroker.email, // Send the email to the broker's registered email address
         subject: 'Account Registration',
         text: `Your account has been registered. Your password is: ${password}`
@@ -83,8 +85,8 @@ function generatePassword() {
   
       transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
-            console.log('Error occurred:', error);
-          res.status(500).json({ message: 'Failed to send email' });
+            console.log('Error occurred:', error.message);
+            res.status(500).json({ message: 'Failed to send email', error: error.message });
         } else {
           console.log('Email sent successfully!');
           res.status(201).json({ message: 'Broker registered successfully!' });

@@ -108,16 +108,64 @@ exports.createUserProfile = async (req, res) => {
     user.job_status = job_status;
     user.smoking = smoking;
     user.pets = pets;
-    // user.chores = chores;
     user.privacy = privacy;
     user.religious_compatibility = religious_compatibility;
     user.socialize=socialize;
     await user.save(); // Save the updated user profile
 
-    res.status(200).json({ message: 'User profile created successfully' });
+    // Retrieve other users' data (example: fetching from a database)
+    const otherUsers = await User.findAll();
+    // Create an array to hold user data and other users' data
+    const userData = [];
+    // Add the user's data to the array
+    userData.push({
+      user: {
+        id: user.id,
+        age: user.age,
+        budget: user.budget,
+        gender: user.gender,
+        religion: user.religion,
+        bio: user.bio,
+        address: user.address,
+        job_status: user.job_status,
+        smoking: user.smoking,
+        pets: user.pets,
+        privacy: user.privacy,
+        religious_compatibility: user.religious_compatibility,
+        socialize: user.socialize,
+    
+      }
+    });
+
+    // Add other users' data to the array
+    for (const otherUser of otherUsers) {
+      userData.push({
+        user: {
+          id: otherUser.id,
+          age: otherUser.age,
+          budget: otherUser.budget,
+          gender: otherUser.gender,
+          religion: otherUser.religion,
+          bio: otherUser.bio,
+          address: otherUser.address,
+          job_status: otherUser.job_status,
+          smoking: otherUser.smoking,
+          pets: otherUser.pets,
+          privacy: otherUser.privacy,
+          religious_compatibility: otherUser.religious_compatibility,
+          socialize: otherUser.socialize,
+        }
+      });
+    }
+
+    // Send the user data and other users' data in the response
+    res.status(200).json({
+      message: 'User profile created successfully',
+      userData: userData
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: 'Internal server error' ,error: error.message });
   }
 };
 

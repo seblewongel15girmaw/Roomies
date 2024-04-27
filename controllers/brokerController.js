@@ -16,17 +16,7 @@ cloudinary.config({
 })
 
 
-// const signUp = async (req, res) => {
-//     try {
-//         const { password } = req.body
-//         const hashed = await bcrypt.hash(password, 10)
-//         const broker = await Broker.create({ ...req.body, password: hashed })
-//         res.json(broker)
-//     }
-//     catch (err) {
-//         console.log(err)
-//     }
-// }
+
 
 // Function to generate a random password
 function generatePassword() {
@@ -97,35 +87,70 @@ function generatePassword() {
       res.status(500).json({ message: 'Internal server error' });
     }
   }
-const signIn = async (req, res) => {
+
+
+//   a function to login brokers
+  async function signIn (req, res) {
     try {
-        const { password, username } = req.body
-        const brokerInfo = await Broker.findOne({ username: username })
-        if (brokerInfo== null) {
-            return res.json("user not found")
-        }
-        const compare = bcrypt.compare(password, brokerInfo.password)
-        if (!compare) {
-            return res.json("incorrect password")
-        }
-        const token = jwt.sign({
-            payload: {
-                brokerId: brokerInfo.brokerId,
-            },
-        }, process.env.JWT_SECRET,
-            {
-                expiresIn: "10d"
-            }
-        )
-
-        res.cookie("auth-token", token, { httpOnly: true, strict: true, sameSite: "Strict" })
-        res.json({ token: token, message: 'logged in' })
-
+      const { email, password } = req.body;
+  
+      // Retrieve the broker from the database
+      const broker = await Broker.getBrokerByEmail(email);
+  
+      if (!broker) {
+        res.status(401).json({ message: 'Invalid email or password' });
+        return;
+      }
+  
+      // Compare the hashed password
+      const isMatch = await bcrypt.compare(password, broker.password);
+  
+      if (!isMatch) {
+        res.status(401).json({ message: 'Invalid email or password' });
+        return;
+      }
+  
+      // Generate a token with the broker ID
+      const token = jwt.sign({ brokerId: broker.id }, process.env.SECRET_KEY, { expiresIn: '1h' });
+      // console.log(token);
+  
+      res.status(200).json({ message: 'Broker logged in successfully', token });
+  
+    } catch (error) {
+      console.error('Error logging in user:', error);
+      res.status(500).json({ message: 'Internal server error', error: error.message });
     }
-    catch (err) {
-        console.log(err)
-    }
-}
+  };
+
+// const signIn = async (req, res) => {
+//     try {
+//         const { password, email } = req.body
+//         const brokerInfo = await Broker.findOne({ email: email })
+//         if (brokerInfo== null) {
+//             return res.json("broker not found")
+//         }
+//         const compare = bcrypt.compare(password, brokerInfo.password)
+//         if (!compare) {
+//             return res.json("incorrect password")
+//         }
+//         const token = jwt.sign({
+//             payload: {
+//                 brokerId: brokerInfo.brokerId,
+//             },
+//         }, process.env.JWT_SECRET,
+//             {
+//                 expiresIn: "10d"
+//             }
+//         )
+
+//         res.cookie("auth-token", token, { httpOnly: true, strict: true, sameSite: "Strict" })
+//         res.json({ token: token, message: 'logged in' })
+
+//     }
+//     catch (err) {
+//         console.log(err)
+//     }
+// }
 
 
 const createProfile = async (req, res) => {

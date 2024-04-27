@@ -117,5 +117,12 @@ const Broker = sequelize.define('Broker', {
     }
   }
 });
+Broker.getBrokerByEmail = async function (email) {
+  return Broker.findOne({
+    where: {
+      email: email
+    }
+  });
+};
 
 module.exports = Broker;

@@ -158,6 +158,12 @@ exports.createUserProfile = async (req, res) => {
       });
     }
 
+    axios.post('http://127.0.0.1:5000/calculate', userData).then(response=>{
+      console.log(response.data)
+    }).catch(error=>{
+      console.log(error)
+    })
+
     // Send the user data and other users' data in the response
     res.status(200).json({
       message: 'User profile created successfully',

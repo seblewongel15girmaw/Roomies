@@ -44,18 +44,24 @@ exports.getPreferenceList = async (req, res) => {
       const userProfileIds = Object.keys(similarityScores);
 
       // Fetch the user profiles based on the extracted IDs
-      const profiles = await UserProfile.findAll({ where: { id: userProfileIds } });
-      console.log(profiles);
+      // const profiles = await UserProfile.findAll({ where: { id: userProfileIds } });
+      // console.log(profiles);
+      const profiles = await UserProfile.findAll({ 
+        where: { id: userProfileIds.map(Number) },
+        attributes: {
+          exclude: ['password', 'email']
+        }
+      });
   
       // Construct the response object with similarity scores, user profiles, and additional user information
       const preferenceList = userProfileIds.map(id => {
         const profile = profiles.find(profile => profile.id === Number(id));
 
-        
+       
         return {
           userId: id,
           similarityScore: similarityScores[id],
-          profile: profile ? profile : null,
+          profile: profile ? profile.toJSON() : null,
         };
       });
 

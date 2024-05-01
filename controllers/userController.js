@@ -140,7 +140,7 @@ exports.createUserProfile = async (req, res) => {
     // Add other users' data to the array
     for (const otherUser of otherUsers) {
       userData.push({
-        user: {
+        other: {
           id: otherUser.id,
           age: otherUser.age,
           budget: otherUser.budget,
@@ -167,6 +167,11 @@ exports.createUserProfile = async (req, res) => {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' ,error: error.message });
   }
+};
+
+// save similarity
+exports.saveSimilarity =async(req, res) =>{
+
 };
 
 

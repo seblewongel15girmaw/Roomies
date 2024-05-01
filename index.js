@@ -30,6 +30,8 @@ const chatRoutes = require('./routes/chatRoute');
 const houseRoutes = require('./routes/houseRoute');
 const feedbackRoutes = require('./routes/feedbackRoute');
 const adminRoutes = require('./routes/adminRoute');
+
+const similarityRoute = require('./routes/similarityRoute.js')
 // const HouseImageRoutes = require('./routes/houseImageRoute');
 
 
@@ -40,6 +42,7 @@ app.use('/api', chatRoutes);
 app.use('/api/houses', houseRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/roommate', similarityRoute);
 // app.use('/api/house-images', HouseImageRoutes);
 
 

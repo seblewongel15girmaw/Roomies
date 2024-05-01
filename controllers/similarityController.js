@@ -1,6 +1,8 @@
 const Similarity = require('../models/similarityModel');
 const UserProfile = require('../models/userModel');
 
+
+// save the similarity score with users
 exports.saveSimilarity = async (req, res) => {
   const similarityScores = req.body;
 
@@ -29,7 +31,7 @@ exports.saveSimilarity = async (req, res) => {
 };
 
 
-
+// get matched user profiles 
 exports.getPreferenceList = async (req, res) => {
   const userId = req.params.id; // Assuming the main user ID is passed as a route parameter
 
@@ -43,9 +45,6 @@ exports.getPreferenceList = async (req, res) => {
       // Extract the user IDs from the similarity scores object
       const userProfileIds = Object.keys(similarityScores);
 
-      // Fetch the user profiles based on the extracted IDs
-      // const profiles = await UserProfile.findAll({ where: { id: userProfileIds } });
-      // console.log(profiles);
       const profiles = await UserProfile.findAll({ 
         where: { id: userProfileIds.map(Number) },
         attributes: {

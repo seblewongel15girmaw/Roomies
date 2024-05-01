@@ -169,10 +169,7 @@ exports.createUserProfile = async (req, res) => {
   }
 };
 
-// save similarity
-exports.saveSimilarity =async(req, res) =>{
 
-};
 
 
 // get All Users

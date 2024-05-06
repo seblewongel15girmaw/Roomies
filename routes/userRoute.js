@@ -31,6 +31,9 @@ router.post('/:id/profile', authenticate, upload.fields([{ name: 'image' }, { na
 // Get All Users
 router.get('/', UserController.getAllUsers);
 
+//  get single users
+router.get('/:id', UserController.getUser);
+
 // Update User Profile
 router.put('/updated/:id',authenticate, UserController.updateUser);
 

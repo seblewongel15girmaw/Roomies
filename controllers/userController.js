@@ -122,23 +122,41 @@ exports.createUserProfile = async (req, res) => {
     
     // Add other users' data to the array
     for (const otherUser of otherUsers) {
-      userData.push({
-        user: {
-          id: otherUser.id,
-          age: otherUser.age,
-          budget: otherUser.budget,
-          gender: otherUser.gender,
-          religion: otherUser.religion,
-          bio: otherUser.bio,
-          address: otherUser.address,
-          job_status: otherUser.job_status,
-          smoking: otherUser.smoking,
-          pets: otherUser.pets,
-          privacy: otherUser.privacy,
-          religious_compatibility: otherUser.religious_compatibility,
-          socialize: otherUser.socialize,
+     
+        // Check if the user has a full profile
+        if (
+          otherUser.age &&
+          otherUser.budget &&
+          otherUser.gender &&
+          otherUser.religion &&
+          otherUser.bio &&
+          otherUser.address &&
+          otherUser.job_status &&
+          otherUser.smoking &&
+          otherUser.pets &&
+          otherUser.privacy &&
+          otherUser.religious_compatibility &&
+          otherUser.socialize
+        ){
+          userData.push({
+            user: {
+              id: otherUser.id,
+              age: otherUser.age,
+              budget: otherUser.budget,
+              gender: otherUser.gender,
+              religion: otherUser.religion,
+              bio: otherUser.bio,
+              address: otherUser.address,
+              job_status: otherUser.job_status,
+              smoking: otherUser.smoking,
+              pets: otherUser.pets,
+              privacy: otherUser.privacy,
+              religious_compatibility: otherUser.religious_compatibility,
+              socialize: otherUser.socialize,
+            }
+          });
         }
-      });
+      
     }
 
     axios.post('http://127.0.0.1:5000/calculate', userData).then(async(response)=>{

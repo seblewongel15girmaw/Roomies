@@ -4,6 +4,7 @@ const UserProfile = require('../models/userModel');
 
 // save the similarity score with users
 exports.saveSimilarity = async (req, res) => {
+  console.log("I am called")
   const similarityScores = req.body;
 
   try {
@@ -31,7 +32,6 @@ exports.saveSimilarity = async (req, res) => {
 };
 
 
-
 // get matched user profiles 
 exports.getPreferenceList = async (req, res) => {
   const userId = req.params.id; // Assuming the main user ID is passed as a route parameter
@@ -40,8 +40,11 @@ exports.getPreferenceList = async (req, res) => {
     // Find the similarity scores for the main user ID
     const similarity = await Similarity.findOne({ where: { userId } });
 
+
     if (similarity) {
-      const similarityScores = JSON.parse(similarity.dataValues.similarityScores);
+      console.log("parse attempt is ont ", similarity.dataValues.similarityScores)
+      const similarityScores = similarity.dataValues.similarityScores;
+      
 
       // Extract the user IDs from the similarity scores object
       const userProfileIds = Object.keys(similarityScores);
@@ -65,6 +68,7 @@ exports.getPreferenceList = async (req, res) => {
         };
       });
 
+      console.log(preferenceList)
       res.status(200).json({ preferenceList });
     } else {
       res.status(404).json({ message: 'Similarity scores not found for the specified user ID.' });

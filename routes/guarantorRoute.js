@@ -17,7 +17,7 @@ const upload=multer({storage:storage})
 
 
 router.get('/', guarantorController.getAllGuarantor);
-router.post('/register',upload.single("guarantor_id"), guarantorController.registerGuarantor);
+router.post('/register/:id',upload.single("guarantor_id"), guarantorController.registerGuarantor);
 router.put('/:id', validateGuarantorRegistration, guarantorController.updateGuarantor);
 router.delete('/:id', guarantorController.deleteGuarantor);
 

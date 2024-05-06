@@ -3,6 +3,11 @@ const sequelize = require("../config/dbConfig")
 const {DataTypes}= require("sequelize")
 
 const Guarantor = sequelize.define("Guarantor", {
+
+  user_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
   full_name: {
     type: DataTypes.STRING,
     allowNull: false

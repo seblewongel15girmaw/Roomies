@@ -1,9 +1,11 @@
 const User = require('../models/userModel');
+const Similarity = require('../models/similarityModel');
 // const pool = require('../config/dbConfig'); // Import the MySQL connection pool
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { Sequelize } = require("sequelize")
+const { Sequelize, where } = require("sequelize")
 const path = require('path');
+const axios=require('axios')
 const imagesDirectory = path.join(__dirname, "..", 'images');
 
 // register User
@@ -117,49 +119,70 @@ exports.createUserProfile = async (req, res) => {
     const otherUsers = await User.findAll();
     // Create an array to hold user data and other users' data
     const userData = [];
-    // Add the user's data to the array
-    userData.push({
-      user: {
-        id: user.id,
-        age: user.age,
-        budget: user.budget,
-        gender: user.gender,
-        religion: user.religion,
-        bio: user.bio,
-        address: user.address,
-        job_status: user.job_status,
-        smoking: user.smoking,
-        pets: user.pets,
-        privacy: user.privacy,
-        religious_compatibility: user.religious_compatibility,
-        socialize: user.socialize,
     
-      }
-    });
-
     // Add other users' data to the array
     for (const otherUser of otherUsers) {
-      userData.push({
-        other: {
-          id: otherUser.id,
-          age: otherUser.age,
-          budget: otherUser.budget,
-          gender: otherUser.gender,
-          religion: otherUser.religion,
-          bio: otherUser.bio,
-          address: otherUser.address,
-          job_status: otherUser.job_status,
-          smoking: otherUser.smoking,
-          pets: otherUser.pets,
-          privacy: otherUser.privacy,
-          religious_compatibility: otherUser.religious_compatibility,
-          socialize: otherUser.socialize,
+     
+        // Check if the user has a full profile
+        if (
+          otherUser.age &&
+          otherUser.budget &&
+          otherUser.gender &&
+          otherUser.religion &&
+          otherUser.bio &&
+          otherUser.address &&
+          otherUser.job_status &&
+          otherUser.smoking &&
+          otherUser.pets &&
+          otherUser.privacy &&
+          otherUser.religious_compatibility &&
+          otherUser.socialize
+        ){
+          userData.push({
+            user: {
+              id: otherUser.id,
+              age: otherUser.age,
+              budget: otherUser.budget,
+              gender: otherUser.gender,
+              religion: otherUser.religion,
+              bio: otherUser.bio,
+              address: otherUser.address,
+              job_status: otherUser.job_status,
+              smoking: otherUser.smoking,
+              pets: otherUser.pets,
+              privacy: otherUser.privacy,
+              religious_compatibility: otherUser.religious_compatibility,
+              socialize: otherUser.socialize,
+            }
+          });
         }
-      });
+      
     }
 
-    axios.post('http://127.0.0.1:5000/calculate', userData).then(response=>{
-      console.log(response.data)
+    axios.post('http://127.0.0.1:5000/calculate', userData).then(async(response)=>{
+      const similarityScores=response.data['matches']
+      try {
+        for (const score of similarityScores) {
+          const { userId, similarityScores } = score;
+    
+          // Check if the user already exists in the similarity table
+          let existingUser = await Similarity.findOne({ where: { userId } });
+    
+          if (existingUser) {
+            // User already exists, update the similarity scores
+            existingUser.similarityScores = similarityScores;
+            await existingUser.save();
+          } else {
+            // User does not exist, create a new record
+            await Similarity.create({ userId, similarityScores });
+          }
+        }
+    
+        
+      } catch (error) {
+        console.error('Error saving similarity scores:', error);
+       
+      }
     }).catch(error=>{
       console.log(error)
     })
@@ -189,6 +212,22 @@ exports.getAllUsers = async (req, res) => {
     res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 };
+
+exports.getUser= async(req,res)=>{
+  try {
+    const userId=req.params.id
+    const user= await User.findOne({
+      where:{
+        id:userId
+      }}
+    )
+    res.status(200).json({user:user})
+  }
+  catch(error){
+    console.log(error)
+    res.status(500).json()
+  }
+}
 
 
 // Update User Profile

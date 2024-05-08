@@ -12,8 +12,8 @@ House.belongsTo(Broker, { foreignKey: 'brokerId' });
 House.hasMany(Image, { foreignKey: 'houseId', onDelete: 'CASCADE' } );
 Image.belongsTo(House, { foreignKey: "houseId" });
     
-// User.hasOne(Guarantor, {foreignKey:"userId", onDelete:"CASCADE"})
-// Guarantor.belongsTo(User, {foreignKey: "userId"})
+User.hasOne(Guarantor, {foreignKey:"userId", onDelete:"CASCADE"})
+Guarantor.belongsTo(User, {foreignKey: "userId"})
  }
 module.exports = setAssociations;
  

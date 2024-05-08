@@ -1,5 +1,6 @@
 const express = require('express');
 require("dotenv").config();
+const bodyParser = require('body-parser')
 const app = express();
 const sequelize = require('./config/dbConfig.js');
 const associations = require("./models/association.js")
@@ -14,7 +15,8 @@ const io = socketIo(server, {
     origin:"*"
   }
 })
-
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.json());
 app.use(cors());
 

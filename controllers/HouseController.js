@@ -1,9 +1,9 @@
-
-const { House, Image } = require("../models/brokerModel")
+const { House, Image } = require("../models/houseModel")
 const cloudinary = require("cloudinary")
 const path = require("path")
 const imagesDirectory = path.join(__dirname, "..", 'images');
 const { Op } = require("sequelize")
+const { Sequelize } = require("sequelize")
 
 cloudinary.config({
     cloud_name: "dqdhs44nq",
@@ -14,12 +14,15 @@ cloudinary.config({
 
 const postHouse = async (req, res) => {
     try {
-        const { brokerId } = req.user
+        // const { brokerId } = req.user
         const { location, price, description, numberOfRoom } = req.body
-
+        const files = req.files;
+        if (!files || files.length === 0) {
+            return res.status(400).send("Files are missing");
+        }
         const house = await House.create({
             location: location, numberOfRoom: numberOfRoom,
-            price: price, description: description, brokerId: brokerId,
+            price: price, description: description,
         })
 
         const imagePaths = req.files.map(file => path.join(imagesDirectory, file.filename));
@@ -106,25 +109,25 @@ const viewSingleHouse = async (req, res) => {
 
 const getAllHouses = async (req, res) => {
     try {
-        const {result}=res.pagination
-        const { brokerId } = req.user
-        const sortBy=req.query.sortby || "price"
-        const { location, numberOfRoom, minPrice, maxPrice,  sortOrder } = req.query
-        const whereClause = {
-            brokerId: brokerId,
-            price: {
-                [Op.lte]: maxPrice || 10000,
-                [Op.gte]: minPrice || 100
-            }
-            // numberOfRoom: {
-            //     [Op.eq]: numberOfRoom || 5
-            // }
-        }
+        // const {result}=res.pagination
+        // const { brokerId } = req.user
+        // const sortBy=req.query.sortby || "price"
+        // const { location, numberOfRoom, minPrice, maxPrice,  sortOrder } = req.query
+        // const whereClause = {
+        //     brokerId: brokerId,
+        //     price: {
+        //         [Op.lte]: maxPrice || 10000,
+        //         [Op.gte]: minPrice || 100
+        //     }
+        // numberOfRoom: {
+        //     [Op.eq]: numberOfRoom || 5
+        // }
+        // }
 
-        const order = sortBy ? [[sortBy, sortOrder || 'DESC']] : []
-        const houseList = await House.findAll({ where: whereClause, include: Image, order: order })
+        // const order = sortBy ? [[sortBy, sortOrder || 'DESC']] : []
+        const houseList = await House.findAll({ include: Image })
         // console.log(result)
-        res.json(result)
+        res.json(houseList)
 
     }
     catch (err) {
@@ -150,5 +153,5 @@ const searchHouse = async (req, res) => {
     }
 }
 
-module.exports = { postHouse, editHouse, deleteHouse, viewSingleHouse, getAllHouses,searchHouse }
+module.exports = { postHouse, editHouse, deleteHouse, viewSingleHouse, getAllHouses, searchHouse }
 

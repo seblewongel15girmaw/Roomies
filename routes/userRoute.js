@@ -44,5 +44,7 @@ router.delete('/:id',authenticate, UserController.deleteUser);
 // forget password
 router.post('/forget-password', UserAuthController.sendGeneratedPassword);
 
+// change password
+router.post('/change-password/:id', authenticate,UserAuthController.changePassword);
 
 module.exports = router;

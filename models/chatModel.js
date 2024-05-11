@@ -2,24 +2,21 @@ const sequelize = require("../config/dbConfig")
 const { DataTypes } = require("sequelize")
 
 const Chat = sequelize.define("Chat", {
-  chat_id: {
-    type: DataTypes.INTEGER,
-    unique:true,
-  },
   sender_id: {
     type: DataTypes.INTEGER,
-    allowNull:false,
+    allowNull: false
   },
   receiver_id: {
     type: DataTypes.INTEGER,
-    allowNull:false
+    allowNull: false
   },
   message: {
-    type: DataTypes.TEXT,
-    allowNull:false
+    type: DataTypes.STRING,
+    allowNull: false
   },
-  timestamp: {
-    type:DataTypes.DATE,
+  status: {
+    type: DataTypes.STRING,
+    allowNull: false
   }
 
 })

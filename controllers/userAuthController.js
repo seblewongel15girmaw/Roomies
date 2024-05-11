@@ -1,12 +1,9 @@
-// // Function to generate a random password
-
 
 const mysql = require("mysql2")
 const User = require("../models/userModel")
 const bcrypt = require("bcrypt")
 const nodemailer = require('nodemailer');
 const jwt = require("jsonwebtoken")
-// const cloudinary = require("cloudinary").v2
 require("dotenv").config()
 
   // Generate a random password
@@ -25,8 +22,6 @@ require("dotenv").config()
   // Send generated password
   async function sendGeneratedPassword(req, res) {
     const { email } = req.body;
-
-  
     try {
       // Find the user with the provided email
 
@@ -78,4 +73,38 @@ require("dotenv").config()
     }
   }
 
-module.exports = { sendGeneratedPassword}
+//   change password
+async function changePassword(req, res) {
+    const { id } = req.params;
+    const { oldPassword, newPassword } = req.body;
+  
+    try {
+      // Find the user with the provided user ID
+      const user = await User.findOne({ where: { id } });
+  
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+  
+      // Check if the old password matches the user's current password
+      const isPasswordMatch = await bcrypt.compare(oldPassword, user.password);
+  
+      if (!isPasswordMatch) {
+        return res.status(400).json({ error: 'Invalid old password' });
+      }
+  
+      // Generate a hash for the new password
+      const newPasswordHash = await bcrypt.hash(newPassword, 10);
+  
+      // Update the user's password
+      user.password = newPasswordHash;
+      await user.save();
+  
+      return res.status(200).json({ message: 'Password changed successfully' });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Internal server error', error: error.message });
+    }
+  }
+
+module.exports = { sendGeneratedPassword,changePassword}

@@ -92,4 +92,12 @@ User.getUserByUsername = async function (username) {
   });
 };
 
+User.getUserByEmail = async function (email) {
+  return User.findOne({
+    where: {
+      email: email
+    }
+  });
+};
+
 module.exports = User;

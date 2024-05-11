@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const UserController = require('../controllers/userController');
+const UserAuthController = require('../controllers/userAuthController');
 const { validateUserRegistration } = require('../middlewares/userValidation');
 const authenticate = require('../middlewares/auth');
 const multer = require("multer")
@@ -39,5 +40,9 @@ router.put('/updated/:id',authenticate, UserController.updateUser);
 
 // Delete User
 router.delete('/:id',authenticate, UserController.deleteUser);
+
+// forget password
+router.post('/forget-password', UserAuthController.sendGeneratedPassword);
+
 
 module.exports = router;

@@ -42,7 +42,7 @@ const similarityRoute = require('./routes/similarityRoute.js')
 app.use('/api/users', userRoutes);
 app.use('/api/brokers', brokerRoutes);
 app.use('/api/guarantors', guarantorRoutes);
-app.use('/api', chatRoutes);
+app.use('/api/chat', chatRoutes);
 app.use('/api/houses', houseRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/admin', adminRoutes);

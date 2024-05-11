@@ -9,6 +9,16 @@ const chatController = require('../controllers/chatController');
 
 // router.post('/chats', validateChatMessage, chatController.createChat);
 
-router.post('/chat', chatController.saveChatData);
+
+// save chat
+router.post('/', chatController.saveChatData);
+
+// get single chats
+router.get('/:sender_id/:receiver_id', chatController.getSingleUserChat);
+
+// get all chats
+router.get('/:sender_id', chatController.getAllUserChat);
+
+
 
 module.exports = router;

@@ -91,7 +91,25 @@ async function getAllUserChat(req, res) {
         attributes: ["id", "username"],
       });
   
-      return res.status(200).json(users);
+      const usersWithLatestMessage = await Promise.all(
+        users.map(async (user) => {
+          const latestMessage = await Chat.findOne({
+            where: {
+              [Op.or]: [
+                { sender_id, receiver_id: user.id },
+                { sender_id: user.id, receiver_id: sender_id },
+              ],
+            },
+            order: [["createdAt", "DESC"]],
+          });
+          return {
+            ...user.toJSON(),
+            latestMessage: latestMessage ? latestMessage.message : null,
+          };
+        })
+      );
+  
+      return res.status(200).json(usersWithLatestMessage);
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error: "Internal server error", error: error.message });

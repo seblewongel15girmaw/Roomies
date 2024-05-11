@@ -15,6 +15,8 @@ const io = socketIo(server, {
     origin:"*"
   }
 })
+
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.json());
@@ -64,15 +66,26 @@ associations();
 
 var clients = {}
 
-io.on("connection", socket => {
-  console.log("new connection")
-  // console.log(socket.id)
-  // socket.on(event, msg => {
-  //   console.log(msg)
-  // })
-})
 
 
+
+io.on('connection', (socket) => {
+  console.log('A user connected');
+
+  socket.on("start", (data) => {
+    console.log(data)
+    clients[data]=socket.id
+  })
+  socket.on('message', (data) => {
+    console.log('Message received from user:', data.receiverId, data.message);
+    
+    io.to(clients[data.receiverId]).emit('message', data); // Send message to the specific user
+  });
+
+  socket.on('disconnect', () => {
+    console.log('A user disconnected');
+  });
+});
 
 // const PORT = 3000;
 server.listen(process.env.APP_PORT, () => {

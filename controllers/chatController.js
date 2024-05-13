@@ -106,7 +106,7 @@ async function getAllUserChat(req, res) {
             id: user.id,
             profile: {
               id: user.id,
-              full_name: user.full_name,
+              username: user.username,
               image: user.image,
             },
             last_message: latestMessage ? latestMessage.message : null,

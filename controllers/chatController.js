@@ -88,7 +88,6 @@ async function getAllUserChat(req, res) {
             [Op.in]: userIds,
           },
         },
-        attributes: ["id", "username"],
       });
   
       const usersWithLatestMessage = await Promise.all(
@@ -102,9 +101,15 @@ async function getAllUserChat(req, res) {
             },
             order: [["createdAt", "DESC"]],
           });
+  
           return {
-            ...user.toJSON(),
-            latestMessage: latestMessage ? latestMessage.message : null,
+            id: user.id,
+            profile: {
+              id: user.id,
+              full_name: user.full_name,
+              image: user.image,
+            },
+            last_message: latestMessage ? latestMessage.message : null,
           };
         })
       );
@@ -115,6 +120,7 @@ async function getAllUserChat(req, res) {
       return res.status(500).json({ error: "Internal server error", error: error.message });
     }
   }
+  
   
 
   

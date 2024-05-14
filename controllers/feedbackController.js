@@ -1,6 +1,6 @@
 const pool = require('../config/dbConfig');
 
-
+const User = require("../models/userModel")
 
 // Create a new feedback
 // async function createFeedback(req, res) {
@@ -43,27 +43,32 @@ async function createFeedback(req, res) {
   }
 }
 
-// module.exports = { createFeedback };
+// get all feedbacks
+async function getAllFeedbacks(req, res) {
+  try {
+    const feedbacks = await Feedback.findAll({
+      include: User, // Include the User model in the query
+    });
 
-// get all feedback
-// async function getAllFeedbacks(req, res) {
-//     try {
-//       // Get a connection from the pool
-//       const connection = await pool.getConnection();
-  
-//       // Execute the query
-//       const [rows] = await connection.query('SELECT * FROM feedbacks');
-  
-//       // Release the connection back to the pool
-//       connection.release();
-  
-//       res.json({ success: true, data: rows });
-//     } catch (error) {
-//       console.error(error);
-//       res.status(500).json({ success: false, error: 'Server Error' });
-//     }
-//   }
-  
+    // Map the feedback data to include the username
+    const feedbacksWithUsername = feedbacks.map(feedback => ({
+      id: feedback.id,
+      username: feedback.User ? feedback.User.username : 'Unknown',
+      rating: feedback.rating,
+      feedback_message: feedback.feedback_message,
+      feedback_category: feedback.feedback_category,
+      createdAt: feedback.createdAt,
+      updatedAt: feedback.updatedAt,
+    }));
+
+    res.status(200).json(feedbacksWithUsername);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
 
 
-module.exports = { createFeedback  };
+
+
+module.exports = { createFeedback,getAllFeedbacks  };

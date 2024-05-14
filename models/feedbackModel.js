@@ -1,5 +1,6 @@
 const sequelize = require("../config/dbConfig");
 const { DataTypes } = require("sequelize");
+const User = require("../models/userModel")
 
 const Feedback = sequelize.define("Feedback", {
   user_id: {
@@ -20,5 +21,7 @@ const Feedback = sequelize.define("Feedback", {
     allowNull: false
   }
 });
+// Define the association
+Feedback.belongsTo(User, { foreignKey: 'user_id' });
 
 module.exports = Feedback;

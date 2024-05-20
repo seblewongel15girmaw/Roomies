@@ -40,6 +40,9 @@ const similarityRoute = require('./routes/similarityRoute.js')
 // const HouseImageRoutes = require('./routes/houseImageRoute');
 
 
+
+
+
 app.use('/api/users', userRoutes);
 app.use('/api/brokers', brokerRoutes);
 app.use('/api/guarantors', guarantorRoutes);

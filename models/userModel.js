@@ -80,7 +80,11 @@ const User = sequelize.define('User', {
   socialize: {
     type: DataTypes.STRING,
     allowNull: true
-  }
+  },
+  profile_status: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
 });
 
 

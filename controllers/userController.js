@@ -12,6 +12,7 @@ const imagesDirectory = path.join(__dirname, "..", 'images');
 exports.registerUser = async (req, res) => {
   try {
     const { full_name, username, email, password } = req.body;
+   
 
     // Check if the username or email already exists in the database
     const existingUser = await User.findOne({
@@ -31,7 +32,9 @@ exports.registerUser = async (req, res) => {
       full_name,
       username,
       email,
-      password: hashedPassword
+      password: hashedPassword,
+      profile_status: 0 
+      
     };
 
     const user = await User.create(userData);
@@ -113,6 +116,7 @@ exports.createUserProfile = async (req, res) => {
     user.privacy = privacy;
     user.religious_compatibility = religious_compatibility;
     user.socialize=socialize;
+    user.profile_status=1;
     await user.save(); // Save the updated user profile
 
     // Retrieve other users' data (example: fetching from a database)
@@ -153,6 +157,7 @@ exports.createUserProfile = async (req, res) => {
               privacy: otherUser.privacy,
               religious_compatibility: otherUser.religious_compatibility,
               socialize: otherUser.socialize,
+              profile_status:otherUser.profile_status,
             }
           });
         }

@@ -110,6 +110,7 @@ async function getAllUserChat(req, res) {
               id: user.id,
               full_name: user.full_name,
               user_name:user.user_name,
+              username: user.username,
               image: user.image,
               address:user.address,
               createdAt:user.createdAt

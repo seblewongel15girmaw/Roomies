@@ -61,7 +61,7 @@ async function getSingleUserChat(req, res) {
 //   get all chats
 async function getAllUserChat(req, res) {
     const { sender_id } = req.params;
-  
+    console.log(typeof(sender_id));
     try {
       const chats = await Chat.findAll({
         where: {
@@ -74,13 +74,15 @@ async function getAllUserChat(req, res) {
       });
   
       const userIds = chats.reduce((ids, chat) => {
-        if (chat.sender_id === sender_id && !ids.includes(chat.receiver_id)) {
+        if (chat.sender_id == sender_id && !ids.includes(chat.receiver_id)) {
           ids.push(chat.receiver_id);
-        } else if (chat.receiver_id === sender_id && !ids.includes(chat.sender_id)) {
+        } else if (chat.receiver_id == sender_id && !ids.includes(chat.sender_id)) {
           ids.push(chat.sender_id);
         }
         return ids;
       }, []);
+
+      console.log("userId are ", userIds)
   
       const users = await User.findAll({
         where: {
@@ -106,8 +108,12 @@ async function getAllUserChat(req, res) {
             id: user.id,
             profile: {
               id: user.id,
+              full_name: user.full_name,
+              user_name:user.user_name,
               username: user.username,
               image: user.image,
+              address:user.address,
+              createdAt:user.createdAt
             },
             last_message: latestMessage ? latestMessage.message : null,
           };

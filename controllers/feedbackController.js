@@ -28,12 +28,15 @@ async function createFeedback(req, res) {
     const { user_id } = req.params;
     const { rating, feedback_message, feedback_category } = req.body;
 
+    // Convert feedback_category to an array if it's not already
+    const categories = Array.isArray(feedback_category) ? feedback_category : [feedback_category];
+
     // Create a new Feedback instance
     const feedback = await Feedback.create({
       user_id,
       rating,
       feedback_message,
-      feedback_category
+      feedback_category: categories.join(',')
     });
 
     res.status(201).json({ success: true, message: 'Feedback created successfully', data: feedback });

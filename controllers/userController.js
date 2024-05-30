@@ -119,6 +119,7 @@ exports.createUserProfile = async (req, res) => {
     user.religious_compatibility = religious_compatibility;
     user.socialize=socialize;
     user.profile_status=1;
+    user.activate_status=1;
     await user.save(); // Save the updated user profile
 
     // Retrieve other users' data (example: fetching from a database)
@@ -129,21 +130,12 @@ exports.createUserProfile = async (req, res) => {
     // Add other users' data to the array
     for (const otherUser of otherUsers) {
      
-        // Check if the user has a full profile
+        // Check if the user has a full profile and activate status is on
         if (
-          otherUser.age &&
-          otherUser.budget &&
-          otherUser.gender &&
-          otherUser.religion &&
-          otherUser.bio &&
-          otherUser.address &&
-          otherUser.job_status &&
-          otherUser.smoking &&
-          otherUser.pets &&
-          otherUser.privacy &&
-          otherUser.religious_compatibility &&
-          otherUser.socialize
-        ){
+        
+          otherUser.profile_status == 1 &&
+          otherUser.activate_status == 1 )
+          {
           userData.push({
             user: {
               id: otherUser.id,
@@ -160,6 +152,7 @@ exports.createUserProfile = async (req, res) => {
               religious_compatibility: otherUser.religious_compatibility,
               socialize: otherUser.socialize,
               profile_status:otherUser.profile_status,
+              activate_status:otherUser.activate_status,
             }
           });
         }
@@ -207,6 +200,34 @@ exports.createUserProfile = async (req, res) => {
 
 
 
+// user activate deactivate changes
+
+exports.recommendedStatus = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    // Fetch the user's current activate status
+    const user = await User.findByPk(userId);
+    const currentStatus = user.activate_status;
+
+    // Update the activate status based on the current status
+    const newStatus = currentStatus === 1 ? 0 : 1;
+
+    // Update the user's activate status
+    await user.update({ activate_status: newStatus });
+
+    res.status(200).json({
+      success: true,
+      message: `activate status updated to ${newStatus}`,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error updating activate status',
+      error: error.message,
+    });
+  }
+};
 
 // get All Users
 exports.getAllUsers = async (req, res) => {

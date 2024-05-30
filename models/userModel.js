@@ -85,6 +85,10 @@ const User = sequelize.define('User', {
     type: DataTypes.INTEGER,
     allowNull: true
   },
+  activate_status: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
 });
 
 

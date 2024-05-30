@@ -25,8 +25,8 @@ router.post('/register',validateUserRegistration,UserController.registerUser);
 // user Login
 router.post('/login', UserController.loginUser);
 
-// user logout
-// router.post('/logout',authenticate, UserController.logout);
+// recommended status
+router.post('/recommended_status_change/:id', UserController.recommendedStatus);
 
 
 

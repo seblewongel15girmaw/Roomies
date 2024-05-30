@@ -81,6 +81,8 @@ exports.loginUser = async (req, res) => {
 
 
 
+
+
 // Create User Profile
 exports.createUserProfile = async (req, res) => {
   try {
@@ -239,13 +241,12 @@ exports.getUser= async(req,res)=>{
 exports.updateUser = async (req, res) => {
   try {
     const userId = req.params.id;
-    const { full_name, username, email, password, gender, age, budget, image, personal_id, bio, phone_number, address, job_status } = req.body;
+    const {full_name,username, gender,religion, age, budget, image, personal_id, bio, phone_number, address, job_status,smoking,pets,privacy,religious_compatibility,socialize} = req.body;
+
 
     await User.update({
       full_name,
       username,
-      email,
-      password,
       gender,
       religion,
       age,
@@ -256,8 +257,11 @@ exports.updateUser = async (req, res) => {
       phone_number,
       address,
       job_status,
-      chores,
       smoking,
+      pets,
+      privacy,
+      religious_compatibility,
+      socialize
       
     
     }, {
@@ -290,3 +294,7 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+
+
+

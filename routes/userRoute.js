@@ -25,12 +25,16 @@ router.post('/register',validateUserRegistration,UserController.registerUser);
 // user Login
 router.post('/login', UserController.loginUser);
 
+// user logout
+// router.post('/logout',authenticate, UserController.logout);
+
+
 
 // Create User Profile
 router.post('/:id/profile', authenticate, upload.fields([{ name: 'image' }, { name: 'personal_id' }]) ,UserController.createUserProfile);
 
 // Get All Users
-router.get('/', UserController.getAllUsers);
+router.get('/',authenticate, UserController.getAllUsers);
 
 //  get single users
 router.get('/:id', UserController.getUser);

@@ -55,7 +55,14 @@ require("dotenv").config()
         from: process.env.EMAIL_USERNAME,
         to: user.email, // Send the email to the broker's registered email address
         subject: 'Password Updated successfully',
-        text: `Your password rest is done successfully. Your New Password is: ${newPassword}`
+
+        text: `
+         We have received a request to reset your account password
+          
+         Your new temporary password is: ${newPassword}
+         For your security, we highly recommend that you log in and change this password to a new, secure password as soon as possible.
+         Thank you for using our service.
+         `
       };
   
       transporter.sendMail(mailOptions, (error, info) => {

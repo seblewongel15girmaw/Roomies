@@ -34,7 +34,7 @@ router.post('/recommended_status_change/:id', UserController.recommendedStatus);
 router.post('/:id/profile', authenticate, upload.fields([{ name: 'image' }, { name: 'personal_id' }]) ,UserController.createUserProfile);
 
 // Get All Users
-router.get('/',authenticate, UserController.getAllUsers);
+router.get('/', UserController.getAllUsers);
 
 //  get single users
 router.get('/:id', UserController.getUser);

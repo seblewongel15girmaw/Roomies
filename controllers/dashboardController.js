@@ -4,14 +4,24 @@ const Admin = require('../models/adminModel');
 
 async function getDashboardStatus(req, res) {
   try {
-    const totalUsers = await User.count();
+    const totalActiveUsers = await User.count({
+      where: {
+        activate_status: 1
+      }
+    });
+    const totalInactiveUsers = await User.count({
+      where: {
+        activate_status: 0
+      }
+    });
     const totalBrokers = await Broker.count();
-    const totalAdmins = await Admin.count();
+    const totalUsers = await User.count();
 
     res.status(200).json({
-      totalUsers,
+      totalActiveUsers,
+      totalInactiveUsers,
       totalBrokers,
-      totalAdmins,
+      totalUsers,
     });
   } catch (error) {
     console.error(error);

@@ -202,24 +202,63 @@ exports.createUserProfile = async (req, res) => {
 
 // user activate deactivate changes
 
+// exports.recommendedStatus = async (req, res) => {
+//   try {
+//     const userId = req.params.id;
+
+//     // Fetch the user's current activate status
+//     const user = await User.findByPk(userId);
+//     const currentStatus = user.activate_status;
+
+//     // Update the activate status based on the current status
+//     const newStatus = currentStatus === 1 ? 0 : 1;
+
+//     // Update the user's activate status
+//     await user.update({ activate_status: newStatus });
+
+//     res.status(200).json({
+//       success: true,
+//       message: `activate status updated to ${newStatus}`,
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       message: 'Error updating activate status',
+//       error: error.message,
+//     });
+//   }
+// };
+
 exports.recommendedStatus = async (req, res) => {
   try {
     const userId = req.params.id;
+    const { password } = req.body;
 
-    // Fetch the user's current activate status
-    const user = await User.findByPk(userId);
-    const currentStatus = user.activate_status;
-
-    // Update the activate status based on the current status
-    const newStatus = currentStatus === 1 ? 0 : 1;
-
-    // Update the user's activate status
-    await user.update({ activate_status: newStatus });
-
-    res.status(200).json({
-      success: true,
-      message: `activate status updated to ${newStatus}`,
+    // Fetch the user's current password and activate_status
+    const user = await User.findByPk(userId, {
+      attributes: ['password', 'activate_status'],
     });
+
+    // Compare the sent password with the user's password
+    if (await bcrypt.compare(password, user.password)) {
+      // Update the activate status based on the current status
+      const newStatus = user.activate_status === 1 ? 0 : 1;
+
+      // Update the user's activate status
+      await User.update({ activate_status: newStatus }, {
+        where: { id: userId },
+      });
+
+      res.status(200).json({
+        success: true,
+        message: `Activate status updated to ${newStatus}`,
+      });
+    } else {
+      res.status(401).json({
+        success: false,
+        message: 'Incorrect password',
+      });
+    }
   } catch (error) {
     res.status(500).json({
       success: false,

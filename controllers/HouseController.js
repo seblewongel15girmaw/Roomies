@@ -12,6 +12,7 @@ cloudinary.config({
 })
 
 
+// post new house
 const postHouse = async (req, res) => {
     try {
         // const { brokerId } = req.user
@@ -37,6 +38,7 @@ const postHouse = async (req, res) => {
 }
 
 
+// edit house
 const editHouse = async (req, res) => {
     try {
         const { houseId } = req.params
@@ -57,6 +59,8 @@ const editHouse = async (req, res) => {
 
 }
 
+
+// delete house
 const deleteHouse = async (req, res) => {
     try {
         const { houseId } = req.params
@@ -81,7 +85,7 @@ const deleteHouse = async (req, res) => {
 
 }
 
-
+// check ownership for house
 const checkOwnership = async (houseId) => {
     try {
         const { brokerId } = req.user
@@ -96,6 +100,8 @@ const checkOwnership = async (houseId) => {
     }
 }
 
+
+// view single house details
 const viewSingleHouse = async (req, res) => {
     try {
         const { houseId } = req.params
@@ -107,24 +113,11 @@ const viewSingleHouse = async (req, res) => {
     }
 }
 
+
+// get all house 
 const getAllHouses = async (req, res) => {
     try {
-        // const {result}=res.pagination
-        // const { brokerId } = req.user
-        // const sortBy=req.query.sortby || "price"
-        // const { location, numberOfRoom, minPrice, maxPrice,  sortOrder } = req.query
-        // const whereClause = {
-        //     brokerId: brokerId,
-        //     price: {
-        //         [Op.lte]: maxPrice || 10000,
-        //         [Op.gte]: minPrice || 100
-        //     }
-        // numberOfRoom: {
-        //     [Op.eq]: numberOfRoom || 5
-        // }
-        // }
-
-        // const order = sortBy ? [[sortBy, sortOrder || 'DESC']] : []
+        
         const houseList = await House.findAll({ include: Image })
         // console.log(result)
         res.json(houseList)

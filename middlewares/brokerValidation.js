@@ -3,13 +3,7 @@ const Broker = require('../models/brokerModel');
 
 exports.validateBrokerRegistration = [
   body('full_name').notEmpty().withMessage('Full name is required'),
-  body('username').notEmpty().withMessage('Username is required').custom(async (value) => {
-    const existingBroker = await Broker.findOne({ where: { username: value } });
-    if (existingBroker) {
-      throw new Error('Username already exists');
-    }
-    return true;
-  }),
+  
   body('email').notEmpty().withMessage('Email is required').isEmail().withMessage('Invalid email format').custom(async (value) => {
     const existingBroker = await Broker.findOne({ where: { email: value } });
     if (existingBroker) {

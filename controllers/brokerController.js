@@ -19,24 +19,29 @@ cloudinary.config({
 
 
 // Function to generate a random password
-function generatePassword() {
-    const length = 8;
-    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let password = '';
-    for (let i = 0; i < length; i++) {
-      const randomIndex = Math.floor(Math.random() * charset.length);
-      password += charset[randomIndex];
-    }
-    console.log('Generated Password:', password);
-    return password;
-  }
+// function generatePassword() {
+//     const length = 8;
+//     const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+//     let password = '';
+//     for (let i = 0; i < length; i++) {
+//       const randomIndex = Math.floor(Math.random() * charset.length);
+//       password += charset[randomIndex];
+//     }
+//     console.log('Generated Password:', password);
+//     return password;
+//   }
   
   
   // Function to register a new broker
   async function signUp(req, res) {
     try {
-      // Generate a random password
-      const password = generatePassword();
+      const files = req.file;
+      if (!files || files.length === 0) {
+          return res.status(400).send("Files are missing");
+      }
+      const imagePath = path.join(imagesDirectory, files.filename);
+
+      const password = req.body.password;
   
       // Hash the password
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -44,19 +49,15 @@ function generatePassword() {
       // Create a new broker record in the database
       const createdBroker = await Broker.create({
         full_name: req.body.full_name,
-        username: req.body.username,
         phone_number1: req.body.phone_number1,
         phone_number2: req.body.phone_number2,
         password: hashedPassword,
         address: req.body.address,
         gender: req.body.gender,
-        email: req.body.email // Assuming you have added the 'email' field to your model
+        email: req.body.email ,
+        profile_pic:imagePath,
+        verify:0,
       });
-  
-     
-
-    
-
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         secure:'true',
@@ -69,8 +70,13 @@ function generatePassword() {
       const mailOptions = {
         from: process.env.EMAIL_USERNAME,
         to: createdBroker.email, // Send the email to the broker's registered email address
-        subject: 'Account Registration',
-        text: `Your account has been registered. Your password is: ${password}`
+        subject: 'Thank You for Registering with Begara',
+        text: `Dear ${createdBroker.full_name},
+
+        Thank you for registering with Begara. We are excited to have you join our community.
+        
+        To ensure the security and legitimacy of our users, we require all new accounts to be verified in person. 
+        Please visit our office at your earliest convenience to complete the verification process. Our office is located at: `
       };
   
       transporter.sendMail(mailOptions, (error, info) => {
@@ -84,7 +90,7 @@ function generatePassword() {
       });
     } catch (error) {
       console.error('Error occurred:', error);
-      res.status(500).json({ message: 'Internal server error' });
+      res.status(500).json({ message: 'Internal server error',error: error.message });
     }
   }
 
@@ -159,7 +165,7 @@ const createProfile = async (req, res) => {
         if (!files || files.length === 0) {
             return res.status(400).send("Files are missing");
         }
-        const imagePath = path.join(imagesDirectory, files.filename);
+        const imagePath = path.join(imagesDirectory, files["image"][0].filename);
         const { phoneNumber1, email } = req.body;
         const { brokerId } = req.user
         const profile = await BrokerProfile.create({

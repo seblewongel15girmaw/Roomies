@@ -20,11 +20,11 @@ const upload = multer({ storage: storage });
 router.route("/").get(getAllBrokers);
 
 
-router.route("/signup").post(validateBrokerRegistration, signUp)
+router.route("/signup").post(upload.single("image"),signUp)
 router.route("/login").post(signIn)
 
 router.route("/getProfile/:id").get(viewProfile)
-router.route("/createProfile").post(upload.single("image"),createProfile)
+// router.route("/createProfile").post(upload.single("image"),createProfile)
 router.route("/editProfile/:id").put(editProfile)
 
 module.exports=router

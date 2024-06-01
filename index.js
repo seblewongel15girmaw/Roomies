@@ -7,6 +7,8 @@ const associations = require("./models/association.js")
 const socketIo=require("socket.io")
 const http = require("http")
 const cors = require("cors")
+
+const userService = require('./services/userServices.js');
 // const multer = require('multer');
 
 const server = http.createServer(app)
@@ -59,6 +61,9 @@ async function syncDatabase() {
     console.error('Error synchronizing database:', error);
   }
 }
+
+// Set up a scheduled job to run the deleteInactiveAccounts function daily
+setInterval(userService.deleteInactiveAccounts, 24 * 60 * 60 * 1000);
 
 syncDatabase();
 associations();

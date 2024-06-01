@@ -20,19 +20,7 @@ const Broker = sequelize.define('Broker', {
       }
     }
   },
-  username: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
-    validate: {
-      notNull: {
-        msg: 'Username is required'
-      },
-      notEmpty: {
-        msg: 'Username must not be empty'
-      }
-    }
-  },
+ 
   email: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -116,6 +104,11 @@ const Broker = sequelize.define('Broker', {
       }
     }
   }
+  ,
+  verify: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
 });
 Broker.getBrokerByEmail = async function (email) {
   return Broker.findOne({

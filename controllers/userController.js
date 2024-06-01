@@ -86,7 +86,7 @@ exports.loginUser = async (req, res) => {
 // Create User Profile
 exports.createUserProfile = async (req, res) => {
   try {
-    const userId = req.params.id; // Assuming the user ID is passed as a route parameter
+    const userId = req.params.id;
     const { gender,religion, age, budget, image, personal_id, bio, phone_number, address, job_status,smoking,pets,privacy,religious_compatibility,socialize} = req.body;
     const files = req.files;
     if (!files || files.length === 0) {
@@ -122,7 +122,7 @@ exports.createUserProfile = async (req, res) => {
     user.activate_status=1;
     await user.save(); // Save the updated user profile
 
-    // Retrieve other users' data (example: fetching from a database)
+    // Retrieve other users' data 
     const otherUsers = await User.findAll();
     // Create an array to hold user data and other users' data
     const userData = [];
@@ -159,7 +159,9 @@ exports.createUserProfile = async (req, res) => {
       
     }
 
-    axios.post('http://127.0.0.1:5000/calculate', userData).then(async(response)=>{
+
+    // 
+axios.post('http://127.0.0.1:5000/calculate', userData).then(async(response)=>{
       const similarityScores=response.data['matches']
       try {
         for (const score of similarityScores) {
@@ -200,34 +202,6 @@ exports.createUserProfile = async (req, res) => {
 
 
 
-// user activate deactivate changes
-
-// exports.recommendedStatus = async (req, res) => {
-//   try {
-//     const userId = req.params.id;
-
-//     // Fetch the user's current activate status
-//     const user = await User.findByPk(userId);
-//     const currentStatus = user.activate_status;
-
-//     // Update the activate status based on the current status
-//     const newStatus = currentStatus === 1 ? 0 : 1;
-
-//     // Update the user's activate status
-//     await user.update({ activate_status: newStatus });
-
-//     res.status(200).json({
-//       success: true,
-//       message: `activate status updated to ${newStatus}`,
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       success: false,
-//       message: 'Error updating activate status',
-//       error: error.message,
-//     });
-//   }
-// };
 
 exports.recommendedStatus = async (req, res) => {
   try {
@@ -280,6 +254,8 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
+
+// get single user
 exports.getUser= async(req,res)=>{
   try {
     const userId=req.params.id

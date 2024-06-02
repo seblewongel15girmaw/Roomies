@@ -30,6 +30,8 @@ cloudinary.config({
 //     console.log('Generated Password:', password);
 //     return password;
 //   }
+
+
   
   
   // Function to register a new broker
@@ -128,59 +130,32 @@ cloudinary.config({
     }
   };
 
-// const signIn = async (req, res) => {
+
+
+// const createProfile = async (req, res) => {
 //     try {
-//         const { password, email } = req.body
-//         const brokerInfo = await Broker.findOne({ email: email })
-//         if (brokerInfo== null) {
-//             return res.json("broker not found")
+//         const files = req.file;
+//         if (!files || files.length === 0) {
+//             return res.status(400).send("Files are missing");
 //         }
-//         const compare = bcrypt.compare(password, brokerInfo.password)
-//         if (!compare) {
-//             return res.json("incorrect password")
-//         }
-//         const token = jwt.sign({
-//             payload: {
-//                 brokerId: brokerInfo.brokerId,
-//             },
-//         }, process.env.JWT_SECRET,
-//             {
-//                 expiresIn: "10d"
-//             }
-//         )
+//         const imagePath = path.join(imagesDirectory, files["image"][0].filename);
+//         const { phoneNumber1, email } = req.body;
+//         const { brokerId } = req.user
+//         const profile = await BrokerProfile.create({
+//             phoneNumber1: phoneNumber1,
+//             email: email,
+//             brokerProfilePic: imagePath,
+//             brokerId: brokerId
+//         });
 
-//         res.cookie("auth-token", token, { httpOnly: true, strict: true, sameSite: "Strict" })
-//         res.json({ token: token, message: 'logged in' })
-
+//         res.json(profile);
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).send("Internal Server Error");
 //     }
-//     catch (err) {
-//         console.log(err)
-//     }
-// }
+// };
 
 
-const createProfile = async (req, res) => {
-    try {
-        const files = req.file;
-        if (!files || files.length === 0) {
-            return res.status(400).send("Files are missing");
-        }
-        const imagePath = path.join(imagesDirectory, files["image"][0].filename);
-        const { phoneNumber1, email } = req.body;
-        const { brokerId } = req.user
-        const profile = await BrokerProfile.create({
-            phoneNumber1: phoneNumber1,
-            email: email,
-            brokerProfilePic: imagePath,
-            brokerId: brokerId
-        });
-
-        res.json(profile);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Internal Server Error");
-    }
-};
 
 // get all Brokers
 const getAllBrokers = async (req, res) => {
@@ -290,5 +265,5 @@ const editProfile = async (req, res) => {
     }
 }
 
-module.exports = { createProfile, viewProfile, editProfile, signIn, signUp, getBrokerProfile, getAllBrokers }
+module.exports = {  viewProfile, editProfile, signIn, signUp, getBrokerProfile, getAllBrokers }
 

@@ -107,6 +107,42 @@ cloudinary.config({
       broker.verify = 1;
      
       await broker.save();
+
+      // send email for brokers to our legal brokers
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        secure:'true',
+        auth: {
+          user: process.env.EMAIL_USERNAME,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+      });
+
+      const mailOptions = {
+        from: process.env.EMAIL_USERNAME,
+        to: broker.email, // Send the email to the broker's registered email address
+        subject: 'Verify House Supplier Accounts',
+        text: `Dear ${broker.full_name},
+
+        We are pleased to inform you that your broker verification has been successfully completed.
+         Congratulations, you are now a Verified House Supplier with our organization.
+
+
+         Thank you for your trust and commitment to working with us.
+          We appreciate your valuable contribution and look forward to a long-standing and mutually beneficial relationship.
+
+`
+      };
+  
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.log('Error occurred:', error.message);
+            res.status(500).json({ message: 'Failed to send email', error: error.message });
+        } else {
+          console.log('Email sent successfully!');
+          res.status(201).json({ message: 'Broker registered successfully!' });
+        }
+      });
   
       console.log(`Broker with ID ${brokerId} has been verified.`);
       res.status(200).json({ message: 'Broker verification updated successfully' });

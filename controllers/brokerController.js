@@ -96,6 +96,27 @@ cloudinary.config({
     }
   }
 
+  // verify brokers account 
+  async function updateVerification(req, res) {
+    try {
+      const brokerId = req.params.id;
+  
+      // Find the broker by ID
+      const broker = await Broker.findByPk(brokerId);
+      // Update the verify field to 1
+      broker.verify = 1;
+     
+      await broker.save();
+  
+      console.log(`Broker with ID ${brokerId} has been verified.`);
+      res.status(200).json({ message: 'Broker verification updated successfully' });
+    } catch (error) {
+      console.error('Error occurred:', error);
+      res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+  }
+
+
 
 //   a function to login brokers
   async function signIn (req, res) {
@@ -132,28 +153,7 @@ cloudinary.config({
 
 
 
-// const createProfile = async (req, res) => {
-//     try {
-//         const files = req.file;
-//         if (!files || files.length === 0) {
-//             return res.status(400).send("Files are missing");
-//         }
-//         const imagePath = path.join(imagesDirectory, files["image"][0].filename);
-//         const { phoneNumber1, email } = req.body;
-//         const { brokerId } = req.user
-//         const profile = await BrokerProfile.create({
-//             phoneNumber1: phoneNumber1,
-//             email: email,
-//             brokerProfilePic: imagePath,
-//             brokerId: brokerId
-//         });
 
-//         res.json(profile);
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).send("Internal Server Error");
-//     }
-// };
 
 
 
@@ -265,5 +265,5 @@ const editProfile = async (req, res) => {
     }
 }
 
-module.exports = {  viewProfile, editProfile, signIn, signUp, getBrokerProfile, getAllBrokers }
+module.exports = {  viewProfile, editProfile, signIn, signUp, getBrokerProfile, getAllBrokers,updateVerification }
 

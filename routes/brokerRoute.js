@@ -1,7 +1,7 @@
 
 const express = require("express")
 const multer=require("multer")
-const { viewProfile, createProfile, editProfile, signUp, signIn ,getAllBrokers} = require("../controllers/brokerController")
+const { viewProfile, updateVerification,editProfile, signUp, signIn ,getAllBrokers} = require("../controllers/brokerController")
 const router = express.Router()
 const { validateBrokerRegistration } = require('../middlewares/brokerValidation')
 
@@ -22,6 +22,10 @@ router.route("/").get(getAllBrokers);
 
 router.route("/signup").post(upload.single("image"),signUp)
 router.route("/login").post(signIn)
+
+// verify brokers
+router.route("/verify-brokers/:id").post(updateVerification)
+
 
 router.route("/getProfile/:id").get(viewProfile)
 // router.route("/createProfile").post(upload.single("image"),createProfile)

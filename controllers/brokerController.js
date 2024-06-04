@@ -5,6 +5,8 @@ const nodemailer = require('nodemailer');
 const jwt = require("jsonwebtoken")
 const cloudinary = require("cloudinary").v2
 require("dotenv").config()
+const twilio = require('twilio');
+
 
 const path = require("path")
 const imagesDirectory = path.join(__dirname, "..", 'images');
@@ -35,18 +37,82 @@ cloudinary.config({
   
   
   // Function to register a new broker
+  // async function signUp(req, res) {
+  //   try {
+  //     const files = req.file;
+  //     if (!files || files.length === 0) {
+  //         return res.status(400).send("Files are missing");
+  //     }
+  //     const imagePath = path.join(imagesDirectory, files.filename);
+
+  //     const password = req.body.password;
+  
+  //     // Hash the password
+  //     const hashedPassword = await bcrypt.hash(password, 10);
+  
+  //     // Create a new broker record in the database
+  //     const createdBroker = await Broker.create({
+  //       full_name: req.body.full_name,
+  //       phone_number1: req.body.phone_number1,
+  //       phone_number2: req.body.phone_number2,
+  //       password: hashedPassword,
+  //       address: req.body.address,
+  //       gender: req.body.gender,
+  //       email: req.body.email ,
+  //       profile_pic:imagePath,
+  //       verify:0,
+  //     });
+  //   const transporter = nodemailer.createTransport({
+  //       service: 'gmail',
+  //       secure:'true',
+  //       auth: {
+  //         user: process.env.EMAIL_USERNAME,
+  //         pass: process.env.EMAIL_PASSWORD,
+  //       },
+  //     });
+
+  //     const mailOptions = {
+  //       from: process.env.EMAIL_USERNAME,
+  //       to: createdBroker.email, // Send the email to the broker's registered email address
+  //       subject: 'Thank You for Registering with Begara',
+  //       text: `Dear ${createdBroker.full_name},
+
+  //       Thank you for registering with Begara. We are excited to have you join our community.
+        
+  //       To ensure the security and legitimacy of our users, we require all new accounts to be verified in person. 
+  //       Please visit our office at your earliest convenience to complete the verification process. Our office is located at: `
+  //     };
+  
+  //     transporter.sendMail(mailOptions, (error, info) => {
+  //       if (error) {
+  //           console.log('Error occurred:', error.message);
+  //           res.status(500).json({ message: 'Failed to send email', error: error.message });
+  //       } else {
+  //         console.log('Email sent successfully!');
+  //         res.status(201).json({ message: 'Broker registered successfully!' });
+  //       }
+  //     });
+  //   } catch (error) {
+  //     console.error('Error occurred:', error);
+  //     res.status(500).json({ message: 'Internal server error',error: error.message });
+  //   }
+  // }
+
   async function signUp(req, res) {
     try {
       const files = req.file;
       if (!files || files.length === 0) {
-          return res.status(400).send("Files are missing");
+        return res.status(400).send("Files are missing");
       }
       const imagePath = path.join(imagesDirectory, files.filename);
-
+  
       const password = req.body.password;
   
       // Hash the password
       const hashedPassword = await bcrypt.hash(password, 10);
+  
+      // Generate a verification code
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
   
       // Create a new broker record in the database
       const createdBroker = await Broker.create({
@@ -56,46 +122,49 @@ cloudinary.config({
         password: hashedPassword,
         address: req.body.address,
         gender: req.body.gender,
-        email: req.body.email ,
-        profile_pic:imagePath,
-        verify:0,
+        email: req.body.email,
+        profile_pic: imagePath,
+        verify: verificationCode
       });
-    const transporter = nodemailer.createTransport({
+  
+      // Send the verification code via SMS using Twilio
+      const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+      await client.messages.create({
+        body: `Your verification code is: ${verificationCode}`,
+        from: process.env.TWILIO_PHONE_NUMBER,
+        to: req.body.phone_number1
+      });
+  
+      // Send the email confirmation
+      const transporter = nodemailer.createTransport({
         service: 'gmail',
-        secure:'true',
+        secure: 'true',
         auth: {
           user: process.env.EMAIL_USERNAME,
-          pass: process.env.EMAIL_PASSWORD,
-        },
-      });
-
-      const mailOptions = {
-        from: process.env.EMAIL_USERNAME,
-        to: createdBroker.email, // Send the email to the broker's registered email address
-        subject: 'Thank You for Registering with Begara',
-        text: `Dear ${createdBroker.full_name},
-
-        Thank you for registering with Begara. We are excited to have you join our community.
-        
-        To ensure the security and legitimacy of our users, we require all new accounts to be verified in person. 
-        Please visit our office at your earliest convenience to complete the verification process. Our office is located at: `
-      };
-  
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            console.log('Error occurred:', error.message);
-            res.status(500).json({ message: 'Failed to send email', error: error.message });
-        } else {
-          console.log('Email sent successfully!');
-          res.status(201).json({ message: 'Broker registered successfully!' });
+          pass: process.env.EMAIL_PASSWORD
         }
       });
+  
+      const mailOptions = {
+        from: process.env.EMAIL_USERNAME,
+        to: createdBroker.email,
+        subject: 'Thank You for Registering with Begara',
+        text: `Dear ${createdBroker.full_name},
+  
+        Thank you for registering with Begara. We have sent a verification code to your phone number. Please enter the code to complete the registration process.
+        `
+      };
+  
+      await transporter.sendMail(mailOptions);
+  
+      res.status(201).json({ message: 'Broker registered successfully!' });
     } catch (error) {
       console.error('Error occurred:', error);
-      res.status(500).json({ message: 'Internal server error',error: error.message });
+      res.status(500).json({ message: 'Internal server error', error: error.message });
     }
   }
 
+  
   // verify brokers account 
   async function updateVerification(req, res) {
     try {

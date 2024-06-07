@@ -20,13 +20,16 @@ const sessions = new Map(); // In-memory session storage
 
 // sign up broker
 async function signup(req, res) {
-  const { full_name, phone_number1, password, address, gender, email } = req.body;
+  const { full_name, phone_number1,phone_number2, password, address, gender, email } = req.body;
 
   const files = req.file;
   if (!files) {
     return res.status(400).send("Files are missing");
   }
-  const imagePath = path.join(imagesDirectory, files.filename);
+  // const imagePath = path.join(imagesDirectory, files.filename);
+
+  const imagePath1 = path.join(imagesDirectory, files["profile_pic"][0].filename);
+  const imagePath2 = path.join(imagesDirectory, files["broker_personal_id"][0].filename)
 
   // Check if phone number is already registered
   const existingBroker = await Broker.findOne({ where: { phone_number1 } });
@@ -39,7 +42,7 @@ async function signup(req, res) {
 
   // Store the verification code and user details in a session
   const sessionId = generateSessionId();
-  sessions.set(sessionId, { verificationCode, full_name, phone_number1, password, address, gender, email, imagePath });
+  sessions.set(sessionId, { verificationCode, full_name, phone_number1,phone_number2, password, address, gender, email, imagePath1,imagePath2 });
 
   // Send the verification code via SMS
   try {
@@ -63,10 +66,10 @@ async function verify(req, res) {
   // Check if the session exists and the verification code is valid
   const session = sessions.get(sessionId);
   if (session && session.verificationCode === verificationCode) {
-    const { full_name, phone_number1, password, address, gender, email, imagePath } = session;
+    const { full_name, phone_number1,phone_number2, password, address, gender, email, imagePath1,imagePath2 } = session;
 
     // Create the user account
-    const newBroker = await createUserAccount(full_name, phone_number1, password, address, gender, email, imagePath);
+    const newBroker = await createUserAccount(full_name, phone_number1,phone_number2, password, address, gender, email, imagePath1,imagePath2);
 
     // Generate token using userId
     const token = jwt.sign({ brokerId: newBroker.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
@@ -83,11 +86,13 @@ async function verify(req, res) {
 async function createUserAccount(
   full_name,
   phone_number1,
+  phone_number2,
   password,
   address,
   gender,
   email,
-  profile_pic
+  profile_pic,
+  broker_personal_id
 ) {
   try {
     // Hash the password
@@ -98,11 +103,13 @@ async function createUserAccount(
     const broker = new Broker({
       full_name,
       phone_number1,
+      phone_number2,
       password: hashedPassword,
       address,
       gender,
       email,
-      profile_pic: profile_pic
+      profile_pic: profile_pic,
+      broker_personal_id:broker_personal_id
     });
 
     // Save the broker and return the created object
@@ -114,7 +121,7 @@ async function createUserAccount(
   }
 }
 
-
+// generate session id
 function generateSessionId() {
   return crypto.randomUUID();
 }
@@ -216,7 +223,7 @@ const getAllBrokers = async (req, res) => {
 //   }
 // }
 
-
+// view  brokers profile
 const viewProfile = async (req, res) => {
   try {
     const { brokerId } = req.user
@@ -228,7 +235,7 @@ const viewProfile = async (req, res) => {
   }
 }
 
-
+// edit broker profile
 const editProfile = async (req, res) => {
   try {
     const { brokerId } = req.user

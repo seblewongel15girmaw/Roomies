@@ -92,6 +92,10 @@ const Broker = sequelize.define('Broker', {
     type: DataTypes.STRING,
     allowNull: true
   },
+  broker_personal_id: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   address: {
     type: DataTypes.STRING,
     allowNull: false,

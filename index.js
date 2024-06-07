@@ -36,9 +36,6 @@ app.use(
 
 // Routes
 
-
-// User routes
-
 const userRoutes = require('./routes/userRoute');
 const brokerRoutes = require('./routes/brokerRoute');
 const guarantorRoutes = require('./routes/guarantorRoute');
@@ -49,7 +46,7 @@ const adminRoutes = require('./routes/adminRoute');
 const dashboardRoutes = require('./routes/dashboardRoute.js');
 
 const similarityRoute = require('./routes/similarityRoute.js')
-// const HouseImageRoutes = require('./routes/houseImageRoute');
+
 
 app.use('/api/users', userRoutes);
 app.use('/api/brokers', brokerRoutes);
@@ -60,8 +57,6 @@ app.use('/api/feedback', feedbackRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/roommate', similarityRoute);
 app.use('/api/home', dashboardRoutes);
-// app.use('/api/house-images', HouseImageRoutes);
-
 
 async function syncDatabase() {
   try {

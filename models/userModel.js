@@ -80,7 +80,10 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true
   },
-
+  profile_status: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
   payment_status: {
     type: DataTypes.INTEGER,
     allowNull: true,

@@ -62,16 +62,16 @@ const Broker = sequelize.define('Broker', {
       }
     }
   },
-  phone_number2: {
-    type: DataTypes.BIGINT,
-    allowNull: true,
-    unique: true,
-    validate: {
-      isNumeric: {
-        msg: 'Phone number 2 must be a numeric value'
-      }
-    }
-  },
+  // phone_number2: {
+  //   type: DataTypes.BIGINT,
+  //   allowNull: true,
+  //   unique: true,
+  //   validate: {
+  //     isNumeric: {
+  //       msg: 'Phone number 2 must be a numeric value'
+  //     }
+  //   }
+  // },
   password: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -105,10 +105,10 @@ const Broker = sequelize.define('Broker', {
     }
   }
   ,
-  verify: {
-    type: DataTypes.INTEGER,
-    allowNull: true
-  },
+  // verify: {
+  //   type: DataTypes.INTEGER,
+  //   allowNull: true
+  // },
 });
 Broker.getBrokerByEmail = async function (email) {
   return Broker.findOne({

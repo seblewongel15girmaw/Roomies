@@ -1,6 +1,7 @@
 const express = require('express');
 require("dotenv").config();
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
+const session = require("express-session");
 const app = express();
 const sequelize = require('./config/dbConfig.js');
 const associations = require("./models/association.js")
@@ -23,6 +24,15 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.json());
 app.use(cors());
+
+// session
+app.use(
+  session({
+    secret: process.env.SECRET_KEY,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 
 // Routes
 

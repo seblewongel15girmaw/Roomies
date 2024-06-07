@@ -6,163 +6,191 @@ const jwt = require("jsonwebtoken")
 const cloudinary = require("cloudinary").v2
 require("dotenv").config()
 const twilio = require('twilio');
+const crypto = require('crypto');
 
 
 const path = require("path")
 const imagesDirectory = path.join(__dirname, "..", 'images');
 
-cloudinary.config({
-    cloud_name: "dqdhs44nq",
-    api_key: "884882689968516",
-    api_secret: "gf7mi7J1k5jjo_PeDJEBW0tzbms"
-})
+
+const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
+const sessions = new Map(); // In-memory session storage
 
 
 
+async function signup(req, res) {
+  const { full_name, phone_number1, password, address, gender, email } = req.body;
 
-// Function to generate a random password
-// function generatePassword() {
-//     const length = 8;
-//     const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-//     let password = '';
-//     for (let i = 0; i < length; i++) {
-//       const randomIndex = Math.floor(Math.random() * charset.length);
-//       password += charset[randomIndex];
+  const files = req.file;
+  if (!files) {
+    return res.status(400).send("Files are missing");
+  }
+  const imagePath = path.join(imagesDirectory, files.filename);
+
+  // Check if phone number is already registered
+  const existingBroker = await Broker.findOne({ where: { phone_number1 } });
+  if (existingBroker) {
+    return res.status(400).json({ error: 'Phone number is already registered' });
+  }
+
+  // Generate a verification code
+  const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+  // Store the verification code and user details in a session
+  const sessionId = generateSessionId();
+  sessions.set(sessionId, { verificationCode, full_name, phone_number1, password, address, gender, email, imagePath });
+
+  // Send the verification code via SMS
+  try {
+    await twilioClient.messages.create({
+      body: `Your verification code is: ${verificationCode}`,
+      from: twilioPhoneNumber,
+      to: phone_number1
+    });
+
+    res.status(200).json({ message: 'Verification code sent', sessionId });
+  } catch (error) {
+    console.error('Error sending SMS:', error);
+    res.status(500).json({ error: 'Error sending verification code' });
+  }
+}
+
+async function verify(req, res) {
+  const { verificationCode, sessionId } = req.body;
+
+  // Check if the session exists and the verification code is valid
+  const session = sessions.get(sessionId);
+  if (session && session.verificationCode === verificationCode) {
+    const { full_name, phone_number1, password, address, gender, email, imagePath } = session;
+
+    // Create the user account
+    const newBroker= await createUserAccount(full_name, phone_number1, password, address, gender, email, imagePath);
+
+    // Generate token using userId
+    const token = jwt.sign({ brokerId: newBroker.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    // Remove the session
+    sessions.delete(sessionId);
+
+    res.status(200).json({ message: 'Phone number verified',token });
+  } else {
+    res.status(400).json({ error: 'Invalid verification code or session' });
+  }
+}
+
+async function createUserAccount(
+  full_name,
+  phone_number1,
+  password,
+  address,
+  gender,
+  email,
+  profile_pic
+) {
+  try {
+    // Hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create the broker
+    const broker = new Broker({
+      full_name,
+      phone_number1,
+      password: hashedPassword,
+      address,
+      gender,
+      email,
+      profile_pic: profile_pic
+    });
+
+    // Save the broker and return the created object
+    const newBroker = await broker.save();
+    return newBroker;
+  } catch (error) {
+    console.error('Error creating broker account:', error);
+    throw error;
+  }
+}
+
+
+function generateSessionId() {
+  return crypto.randomUUID();
+}
+
+
+  
+// Function to register a new broker
+//  async function signUp(req, res) {
+//     try {
+      // const files = req.file;
+      // if (!files || files.length === 0) {
+      //   return res.status(400).send("Files are missing");
+      // }
+      // const imagePath = path.join(imagesDirectory, files.filename);
+  
+//       const password = req.body.password;
+  
+//       // Hash the password
+//       const hashedPassword = await bcrypt.hash(password, 10);
+  
+//       // Generate a verification code
+//       const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+  
+//       // Create a new broker record in the database
+//       const createdBroker = await Broker.create({
+//         full_name: req.body.full_name,
+//         phone_number1: req.body.phone_number1,
+//         phone_number2: req.body.phone_number2,
+//         password: hashedPassword,
+//         address: req.body.address,
+//         gender: req.body.gender,
+//         email: req.body.email,
+//         profile_pic: imagePath,
+//         verify: verificationCode
+//       });
+  
+//       // Send the verification code via SMS using Twilio
+//       const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+//       await client.messages.create({
+//         body: `Your verification code is: ${verificationCode}`,
+//         from: process.env.TWILIO_PHONE_NUMBER,
+//         to: req.body.phone_number1
+//       });
+  
+//       // Send the email confirmation
+//       const transporter = nodemailer.createTransport({
+//         service: 'gmail',
+//         secure: 'true',
+//         auth: {
+//           user: process.env.EMAIL_USERNAME,
+//           pass: process.env.EMAIL_PASSWORD
+//         }
+//       });
+  
+//       const mailOptions = {
+//         from: process.env.EMAIL_USERNAME,
+//         to: createdBroker.email,
+//         subject: 'Thank You for Registering with Begara',
+//         text: `Dear ${createdBroker.full_name},
+  
+//         Thank you for registering with Begara. We have sent a verification code to your phone number. Please enter the code to complete the registration process.
+//         `
+//       };
+  
+//       await transporter.sendMail(mailOptions);
+  
+//       res.status(201).json({ message: 'Broker registered successfully!' });
+//     } catch (error) {
+//       console.error('Error occurred:', error);
+//       res.status(500).json({ message: 'Internal server error', error: error.message });
 //     }
-//     console.log('Generated Password:', password);
-//     return password;
 //   }
 
 
-  
-  
-  // Function to register a new broker
-  // async function signUp(req, res) {
-  //   try {
-  //     const files = req.file;
-  //     if (!files || files.length === 0) {
-  //         return res.status(400).send("Files are missing");
-  //     }
-  //     const imagePath = path.join(imagesDirectory, files.filename);
 
-  //     const password = req.body.password;
-  
-  //     // Hash the password
-  //     const hashedPassword = await bcrypt.hash(password, 10);
-  
-  //     // Create a new broker record in the database
-  //     const createdBroker = await Broker.create({
-  //       full_name: req.body.full_name,
-  //       phone_number1: req.body.phone_number1,
-  //       phone_number2: req.body.phone_number2,
-  //       password: hashedPassword,
-  //       address: req.body.address,
-  //       gender: req.body.gender,
-  //       email: req.body.email ,
-  //       profile_pic:imagePath,
-  //       verify:0,
-  //     });
-  //   const transporter = nodemailer.createTransport({
-  //       service: 'gmail',
-  //       secure:'true',
-  //       auth: {
-  //         user: process.env.EMAIL_USERNAME,
-  //         pass: process.env.EMAIL_PASSWORD,
-  //       },
-  //     });
 
-  //     const mailOptions = {
-  //       from: process.env.EMAIL_USERNAME,
-  //       to: createdBroker.email, // Send the email to the broker's registered email address
-  //       subject: 'Thank You for Registering with Begara',
-  //       text: `Dear ${createdBroker.full_name},
 
-  //       Thank you for registering with Begara. We are excited to have you join our community.
-        
-  //       To ensure the security and legitimacy of our users, we require all new accounts to be verified in person. 
-  //       Please visit our office at your earliest convenience to complete the verification process. Our office is located at: `
-  //     };
-  
-  //     transporter.sendMail(mailOptions, (error, info) => {
-  //       if (error) {
-  //           console.log('Error occurred:', error.message);
-  //           res.status(500).json({ message: 'Failed to send email', error: error.message });
-  //       } else {
-  //         console.log('Email sent successfully!');
-  //         res.status(201).json({ message: 'Broker registered successfully!' });
-  //       }
-  //     });
-  //   } catch (error) {
-  //     console.error('Error occurred:', error);
-  //     res.status(500).json({ message: 'Internal server error',error: error.message });
-  //   }
-  // }
-
-  async function signUp(req, res) {
-    try {
-      const files = req.file;
-      if (!files || files.length === 0) {
-        return res.status(400).send("Files are missing");
-      }
-      const imagePath = path.join(imagesDirectory, files.filename);
-  
-      const password = req.body.password;
-  
-      // Hash the password
-      const hashedPassword = await bcrypt.hash(password, 10);
-  
-      // Generate a verification code
-      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-  
-      // Create a new broker record in the database
-      const createdBroker = await Broker.create({
-        full_name: req.body.full_name,
-        phone_number1: req.body.phone_number1,
-        phone_number2: req.body.phone_number2,
-        password: hashedPassword,
-        address: req.body.address,
-        gender: req.body.gender,
-        email: req.body.email,
-        profile_pic: imagePath,
-        verify: verificationCode
-      });
-  
-      // Send the verification code via SMS using Twilio
-      const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-      await client.messages.create({
-        body: `Your verification code is: ${verificationCode}`,
-        from: process.env.TWILIO_PHONE_NUMBER,
-        to: req.body.phone_number1
-      });
-  
-      // Send the email confirmation
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        secure: 'true',
-        auth: {
-          user: process.env.EMAIL_USERNAME,
-          pass: process.env.EMAIL_PASSWORD
-        }
-      });
-  
-      const mailOptions = {
-        from: process.env.EMAIL_USERNAME,
-        to: createdBroker.email,
-        subject: 'Thank You for Registering with Begara',
-        text: `Dear ${createdBroker.full_name},
-  
-        Thank you for registering with Begara. We have sent a verification code to your phone number. Please enter the code to complete the registration process.
-        `
-      };
-  
-      await transporter.sendMail(mailOptions);
-  
-      res.status(201).json({ message: 'Broker registered successfully!' });
-    } catch (error) {
-      console.error('Error occurred:', error);
-      res.status(500).json({ message: 'Internal server error', error: error.message });
-    }
-  }
 
   
   // verify brokers account 
@@ -255,11 +283,6 @@ cloudinary.config({
       res.status(500).json({ message: 'Internal server error', error: error.message });
     }
   };
-
-
-
-
-
 
 
 // get all Brokers
@@ -370,5 +393,5 @@ const editProfile = async (req, res) => {
     }
 }
 
-module.exports = {  viewProfile, editProfile, signIn, signUp, getBrokerProfile, getAllBrokers,updateVerification }
+module.exports = {  viewProfile, editProfile, signIn, verify,signup, getBrokerProfile, getAllBrokers,updateVerification }
 

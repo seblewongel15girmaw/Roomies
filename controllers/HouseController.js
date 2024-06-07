@@ -15,7 +15,7 @@ cloudinary.config({
 // post new house
 const postHouse = async (req, res) => {
     try {
-        // const { brokerId } = req.user
+        const { brokerId } = req.user
         const { location, price, description, numberOfRoom } = req.body
         const files = req.files;
         if (!files || files.length === 0) {

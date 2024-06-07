@@ -5,14 +5,14 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { Sequelize, where } = require("sequelize")
 const path = require('path');
-const axios=require('axios')
+const axios = require('axios')
 const imagesDirectory = path.join(__dirname, "..", 'images');
 
 // register User
 exports.registerUser = async (req, res) => {
   try {
     const { full_name, username, email, password } = req.body;
-   
+
 
     // Check if the username or email already exists in the database
     const existingUser = await User.findOne({
@@ -33,8 +33,8 @@ exports.registerUser = async (req, res) => {
       username,
       email,
       password: hashedPassword,
-      profile_status: 0 
-      
+      profile_status: 0
+
     };
 
     const user = await User.create(userData);
@@ -87,13 +87,13 @@ exports.loginUser = async (req, res) => {
 exports.createUserProfile = async (req, res) => {
   try {
     const userId = req.params.id;
-    const { gender,religion, age, budget, image, personal_id, bio, phone_number, address, job_status,smoking,pets,privacy,religious_compatibility,socialize} = req.body;
+    const { gender, religion, age, budget, image, personal_id, bio, phone_number, address, job_status, smoking, pets, privacy, religious_compatibility, socialize } = req.body;
     const files = req.files;
     if (!files || files.length === 0) {
       return res.status(400).send("Files are missing");
     }
     const imagePath1 = path.join(imagesDirectory, files["image"][0].filename);
-    const imagePath2=path.join(imagesDirectory,files["personal_id"][0].filename)
+    const imagePath2 = path.join(imagesDirectory, files["personal_id"][0].filename)
     // Find the user by ID
     const user = await User.findByPk(userId);
 
@@ -111,65 +111,65 @@ exports.createUserProfile = async (req, res) => {
     user.personal_id = imagePath2;
     user.bio = bio;
     user.phone_number = phone_number;
-    user.address =address;
+    user.address = address;
     user.job_status = job_status;
     user.smoking = smoking;
     user.pets = pets;
     user.privacy = privacy;
     user.religious_compatibility = religious_compatibility;
-    user.socialize=socialize;
-    user.profile_status=1;
-    user.activate_status=1;
+    user.socialize = socialize;
+    user.profile_status = 1;
+    user.activate_status = 1;
     await user.save(); // Save the updated user profile
 
     // Retrieve other users' data 
     const otherUsers = await User.findAll();
     // Create an array to hold user data and other users' data
     const userData = [];
-    
+
     // Add other users' data to the array
     for (const otherUser of otherUsers) {
-     
-        // Check if the user has a full profile and activate status is on
-        if (
-        
-          otherUser.profile_status == 1 &&
-          otherUser.activate_status == 1 )
-          {
-          userData.push({
-            user: {
-              id: otherUser.id,
-              age: otherUser.age,
-              budget: otherUser.budget,
-              gender: otherUser.gender,
-              religion: otherUser.religion,
-              bio: otherUser.bio,
-              address: otherUser.address,
-              job_status: otherUser.job_status,
-              smoking: otherUser.smoking,
-              pets: otherUser.pets,
-              privacy: otherUser.privacy,
-              religious_compatibility: otherUser.religious_compatibility,
-              socialize: otherUser.socialize,
-              profile_status:otherUser.profile_status,
-              activate_status:otherUser.activate_status,
-            }
-          });
-        }
-      
+
+      // Check if the user has a full profile and activate status is on
+      if (
+
+        otherUser.profile_status == 1 &&
+        otherUser.activate_status == 1) {
+        userData.push({
+          user: {
+            id: otherUser.id,
+            age: otherUser.age,
+            budget: otherUser.budget,
+            gender: otherUser.gender,
+            religion: otherUser.religion,
+            bio: otherUser.bio,
+            address: otherUser.address,
+            job_status: otherUser.job_status,
+            smoking: otherUser.smoking,
+            pets: otherUser.pets,
+            privacy: otherUser.privacy,
+            religious_compatibility: otherUser.religious_compatibility,
+            socialize: otherUser.socialize,
+            profile_status: otherUser.profile_status,
+            activate_status: otherUser.activate_status,
+          }
+        });
+      }
+
     }
 
+    // console.log(userData)
 
     // 
-axios.post('http://127.0.0.1:5000/calculate', userData).then(async(response)=>{
-      const similarityScores=response.data['matches']
+    axios.post('http://127.0.0.1:5000/calculate', userData).then(async (response) => {
+      const similarityScores = response.data['matches']
       try {
         for (const score of similarityScores) {
           const { userId, similarityScores } = score;
-    
+
           // Check if the user already exists in the similarity table
           let existingUser = await Similarity.findOne({ where: { userId } });
-    
+
           if (existingUser) {
             // User already exists, update the similarity scores
             existingUser.similarityScores = similarityScores;
@@ -179,13 +179,13 @@ axios.post('http://127.0.0.1:5000/calculate', userData).then(async(response)=>{
             await Similarity.create({ userId, similarityScores });
           }
         }
-    
-        
+
+
       } catch (error) {
         console.error('Error saving similarity scores:', error);
-       
+
       }
-    }).catch(error=>{
+    }).catch(error => {
       console.log(error)
     })
 
@@ -196,7 +196,7 @@ axios.post('http://127.0.0.1:5000/calculate', userData).then(async(response)=>{
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Internal server error' ,error: error.message });
+    res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 };
 
@@ -256,17 +256,18 @@ exports.getAllUsers = async (req, res) => {
 
 
 // get single user
-exports.getUser= async(req,res)=>{
+exports.getUser = async (req, res) => {
   try {
-    const userId=req.params.id
-    const user= await User.findOne({
-      where:{
-        id:userId
-      }}
+    const userId = req.params.id
+    const user = await User.findOne({
+      where: {
+        id: userId
+      }
+    }
     )
-    res.status(200).json({user:user})
+    res.status(200).json({ user: user })
   }
-  catch(error){
+  catch (error) {
     console.log(error)
     res.status(500).json()
   }
@@ -277,7 +278,7 @@ exports.getUser= async(req,res)=>{
 exports.updateUser = async (req, res) => {
   try {
     const userId = req.params.id;
-    const {full_name,username, gender,religion, age, budget, image, personal_id, bio, phone_number, address, job_status,smoking,pets,privacy,religious_compatibility,socialize} = req.body;
+    const { full_name, username, gender, religion, age, budget, image, personal_id, bio, phone_number, address, job_status, smoking, pets, privacy, religious_compatibility, socialize } = req.body;
 
 
     await User.update({
@@ -298,8 +299,6 @@ exports.updateUser = async (req, res) => {
       privacy,
       religious_compatibility,
       socialize
-      
-    
     }, {
       where: {
         id: userId
@@ -331,6 +330,41 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
+exports.changePaymentStatus = async (req, res) => {
+  try {
+    const { userId } = req.params
+    if (!userId) {
+      return res.status(400).json({ error: "User ID is required" });
+    }
+    await User.update({
+      payment_status: 1
+    },
+      {
+        where: {
+          id: userId
+        }
+      })
 
+    res.json("payment status updated");
+  }
+  catch (err) {
+    res.json("error has occured while updating payment status")
+  }
+}
 
-
+exports.getUserStatus = async (req, res) => {
+  try {
+    const { userId } = req.params
+    if (!userId) {
+      return res.status(400).json({ error: "User ID is required" });
+    }
+    const user = await User.findOne({
+      attributes: ['activate_status', 'payment_status'],
+      where: { id: userId }
+    });
+    res.json(user);
+  }
+  catch (err) {
+    res.status(500).json(err);
+  }
+}

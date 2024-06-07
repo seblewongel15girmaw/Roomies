@@ -5,7 +5,7 @@ const session = require("express-session");
 const app = express();
 const sequelize = require('./config/dbConfig.js');
 const associations = require("./models/association.js")
-const socketIo=require("socket.io")
+const socketIo = require("socket.io")
 const http = require("http")
 const cors = require("cors")
 
@@ -15,13 +15,13 @@ const userService = require('./services/userServices.js');
 const server = http.createServer(app)
 const io = socketIo(server, {
   cors: {
-    origin:"*"
+    origin: "*"
   }
 })
 
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 
@@ -90,11 +90,11 @@ io.on('connection', (socket) => {
 
   socket.on("start", (data) => {
     console.log(data)
-    clients[data]=socket.id
+    clients[data] = socket.id
   })
   socket.on('message', (data) => {
     console.log('Message received from user:', data.receiverId, data.message);
-    
+
     io.to(clients[data.receiverId]).emit('message', data); // Send message to the specific user
   });
 

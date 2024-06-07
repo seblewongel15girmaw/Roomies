@@ -24,11 +24,8 @@ router.route("/login").post(signIn)
 // get all brokers
 router.route("/").get(getAllBrokers);
 
-
-
-// verify brokers
-// router.route("/verify-brokers/:id").post(updateVerification)
-
+router.route("/signup").post(upload.single("image"),signUp)
+router.route("/login").post(signIn)
 
 router.route("/getProfile/:id").get(viewProfile)
 // router.route("/createProfile").post(upload.single("image"),createProfile)

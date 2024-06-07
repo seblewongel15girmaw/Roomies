@@ -85,7 +85,7 @@ exports.registerAdmin = async (req, res) => {
     }
   };
 
-  // Logout admin
+
 // Logout admin
 exports.logoutAdmin = async (req, res) => {
   try {

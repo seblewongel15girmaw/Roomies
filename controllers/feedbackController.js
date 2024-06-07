@@ -1,26 +1,8 @@
-const pool = require('../config/dbConfig');
-
-const User = require("../models/userModel")
-
-// Create a new feedback
-// async function createFeedback(req, res) {
-//   try {
-//     const { user_id, date, rating, feedback_message, feedback_category } = req.body;
-
-//     // Insert the feedback into the database
-//     const query = `
-//       INSERT INTO feedbacks (user_id, date, rating, feedback_message, feedback_category)
-//       VALUES (?, ?, ?, ?, ?)
-//     `;
-//     await db.query(query, [user_id, date, rating, feedback_message, feedback_category]);
-
-//     res.status(201).json({ success: true, message: 'Feedback created successfully' });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ success: false, error: error.message });
-//   }
-// }
+// const pool = require('../config/dbConfig');
+const User = require("../models/userModel");
 const Feedback = require('../models/feedbackModel');
+
+
 
 // Create a new feedback
 async function createFeedback(req, res) {
@@ -70,8 +52,6 @@ async function getAllFeedbacks(req, res) {
     res.status(500).json({ success: false, error: error.message });
   }
 }
-
-
 
 
 module.exports = { createFeedback,getAllFeedbacks  };

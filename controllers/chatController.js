@@ -128,8 +128,6 @@ async function getAllUserChat(req, res) {
   }
   
   
-
-  
   module.exports = {
     saveChatData,
     getSingleUserChat,

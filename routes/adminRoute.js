@@ -3,9 +3,12 @@ const router = express.Router();
 const AdminController = require('../controllers/adminController');
 
 
-// Register a User 
+// Register a admins 
 router.post('/register', AdminController.registerAdmin);
+
+// get all admin
 router.get('/', AdminController.getAllAdmins);
+
 // admin login 
 router.post('/login', AdminController.loginAdmin);
 

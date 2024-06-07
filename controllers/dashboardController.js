@@ -2,6 +2,8 @@ const User = require('../models/userModel');
 const Broker = require('../models/brokerModel');
 const Admin = require('../models/adminModel');
 
+
+// dashboard data
 async function getDashboardStatus(req, res) {
   try {
     const totalActiveUsers = await User.count({

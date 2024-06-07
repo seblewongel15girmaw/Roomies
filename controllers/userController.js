@@ -330,6 +330,8 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
+
+// update payment status
 exports.changePaymentStatus = async (req, res) => {
   try {
     const { userId } = req.params

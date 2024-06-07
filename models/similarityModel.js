@@ -17,11 +17,8 @@ const Similarity = sequelize.define('Similarity', {
         defaultValue: {}
       }
  
-  
-  
+
 });
-
-
 
 
 module.exports = Similarity;

@@ -5,11 +5,11 @@ const imagesDirectory = path.join(__dirname, "..", 'images');
 const { Op } = require("sequelize")
 const { Sequelize } = require("sequelize")
 
-cloudinary.config({
-    cloud_name: "dqdhs44nq",
-    api_key: "544857432499217",
-    api_secret: "MYbbMctHshdYR_3ELvkDpJLQx8o"
-})
+// cloudinary.config({
+//     cloud_name: "dqdhs44nq",
+//     api_key: "544857432499217",
+//     api_secret: "MYbbMctHshdYR_3ELvkDpJLQx8o"
+// })
 
 
 // post new house
@@ -115,11 +115,10 @@ const viewSingleHouse = async (req, res) => {
 
 
 // get all house 
-const getAllUserBasedHouses = async (req, res) => {
+const getAllHouses = async (req, res) => {
     try {
         
         const houseList = await House.findAll({ include: Image })
-        // console.log(result)
         res.json(houseList)
 
     }
@@ -129,8 +128,8 @@ const getAllUserBasedHouses = async (req, res) => {
 }
 
 
-// get all house based on user status
-const getAllHouses = async (req, res) => {
+// get all house based on user status  
+const getAllUserBasedHouses = async (req, res) => {
     try {
       const userId = req.params.id; // Get the user ID from the route parameter
       const user = await User.findByPk(userId);
@@ -209,7 +208,7 @@ const getHousesBasedOnRooms = async (req, res) => {
     }
   };
 
-const searchHouse = async (req, res) => {
+/* const searchHouse = async (req, res) => {
     const { brokerId } = req.user
     const { location } = re.query
     try {
@@ -225,7 +224,7 @@ const searchHouse = async (req, res) => {
     catch (err) {
         res.json(err)
     }
-}
+} */
 
-module.exports = { postHouse, editHouse, deleteHouse, viewSingleHouse, getAllHouses, searchHouse,getHousesBasedOnRooms,getAllUserBasedHouses}
+module.exports = { postHouse, editHouse, deleteHouse, viewSingleHouse, getAllHouses,getHousesBasedOnRooms,getAllUserBasedHouses}
 

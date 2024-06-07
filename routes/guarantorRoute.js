@@ -15,10 +15,15 @@ const storage = multer.diskStorage({
 
 const upload=multer({storage:storage})
 
-
+// get all guarantors
 router.get('/', guarantorController.getAllGuarantor);
+
+// register guarantors
 router.post('/register/:id',upload.single("guarantor_id"), guarantorController.registerGuarantor);
+
+// update guarantors
 router.put('/:id', validateGuarantorRegistration, guarantorController.updateGuarantor);
+// delete guarantors
 router.delete('/:id', guarantorController.deleteGuarantor);
 
 module.exports = router;

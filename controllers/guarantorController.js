@@ -3,6 +3,8 @@ const Guarantor = require('../models/guarantorModel');
 const path = require("path")
 const imagesDirectory=path.join(__dirname, "..", "images")
 
+
+// get all guarantors
 const getAllGuarantor = async (req, res) => {
   try {
    const brokers= await Guarantor.findAll()
@@ -13,30 +15,8 @@ const getAllGuarantor = async (req, res) => {
 };
 
 
-// function that registor guarantors
-// const registerGuarantor = async (req, res) => {
-//   try {
-//     var image_url
-//       // accept the user id from the token then store 
-//       const {
-//         full_name, address, phone_number, gender
-//       } = req.body;
-//     if (req.file) {
-//       const file = req.file;
-//      image_url=path.join(imagesDirectory, file.filename)
-//     }
-//       const guarantorData = {
-//         full_name,personal_id:image_url, address, phone_number, gender
-//       };
-  
-//       const guarantorID = await Guarantor.create(guarantorData);
-  
-//       res.status(201).json({ message: 'Guarantor registered successfully', guarantorID });
-//     } catch (error) {
-//       console.error('Error registering user:', error);
-//       res.status(500).json({ message: 'Internal server error', error: error.message });
-//     }
-// };
+// function that register guarantors
+
 const registerGuarantor = async (req, res) => {
   try {
     const { id } = req.params; // Extract user_id from URL parameters
@@ -67,7 +47,7 @@ const registerGuarantor = async (req, res) => {
   }
 };
   
-
+// update guarantor info
  const updateGuarantor = async (req, res) => {
     try {
       const guarantorId = req.params.id;  
@@ -80,6 +60,8 @@ const registerGuarantor = async (req, res) => {
     }
   };
   
+
+  // delete guarantor
 const deleteGuarantor = async (req, res) => {
     try {
       const guarantorId = req.params.id;

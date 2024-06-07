@@ -12,13 +12,13 @@ const crypto = require('crypto');
 const path = require("path")
 const imagesDirectory = path.join(__dirname, "..", 'images');
 
-
+//  twilio info
 const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
 const sessions = new Map(); // In-memory session storage
 
 
-
+// sign up broker
 async function signup(req, res) {
   const { full_name, phone_number1, password, address, gender, email } = req.body;
 
@@ -56,6 +56,7 @@ async function signup(req, res) {
   }
 }
 
+// verify users phone number
 async function verify(req, res) {
   const { verificationCode, sessionId } = req.body;
 
@@ -119,138 +120,6 @@ function generateSessionId() {
 }
 
 
-
-// Function to register a new broker
-//  async function signUp(req, res) {
-//     try {
-// const files = req.file;
-// if (!files || files.length === 0) {
-//   return res.status(400).send("Files are missing");
-// }
-// const imagePath = path.join(imagesDirectory, files.filename);
-
-//       const password = req.body.password;
-
-//       // Hash the password
-//       const hashedPassword = await bcrypt.hash(password, 10);
-
-//       // Generate a verification code
-//       const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-//       // Create a new broker record in the database
-//       const createdBroker = await Broker.create({
-//         full_name: req.body.full_name,
-//         phone_number1: req.body.phone_number1,
-//         phone_number2: req.body.phone_number2,
-//         password: hashedPassword,
-//         address: req.body.address,
-//         gender: req.body.gender,
-//         email: req.body.email,
-//         profile_pic: imagePath,
-//         verify: verificationCode
-//       });
-
-//       // Send the verification code via SMS using Twilio
-//       const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-//       await client.messages.create({
-//         body: `Your verification code is: ${verificationCode}`,
-//         from: process.env.TWILIO_PHONE_NUMBER,
-//         to: req.body.phone_number1
-//       });
-
-//       // Send the email confirmation
-//       const transporter = nodemailer.createTransport({
-//         service: 'gmail',
-//         secure: 'true',
-//         auth: {
-//           user: process.env.EMAIL_USERNAME,
-//           pass: process.env.EMAIL_PASSWORD
-//         }
-//       });
-
-//       const mailOptions = {
-//         from: process.env.EMAIL_USERNAME,
-//         to: createdBroker.email,
-//         subject: 'Thank You for Registering with Begara',
-//         text: `Dear ${createdBroker.full_name},
-
-//         Thank you for registering with Begara. We have sent a verification code to your phone number. Please enter the code to complete the registration process.
-//         `
-//       };
-
-//       await transporter.sendMail(mailOptions);
-
-//       res.status(201).json({ message: 'Broker registered successfully!' });
-//     } catch (error) {
-//       console.error('Error occurred:', error);
-//       res.status(500).json({ message: 'Internal server error', error: error.message });
-//     }
-//   }
-
-
-
-
-
-
-
-// verify brokers account 
-async function updateVerification(req, res) {
-  try {
-    const brokerId = req.params.id;
-
-    // Find the broker by ID
-    const broker = await Broker.findByPk(brokerId);
-    // Update the verify field to 1
-    broker.verify = 1;
-
-    await broker.save();
-
-    // send email for brokers to our legal brokers
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      secure: 'true',
-      auth: {
-        user: process.env.EMAIL_USERNAME,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
-
-    const mailOptions = {
-      from: process.env.EMAIL_USERNAME,
-      to: broker.email, // Send the email to the broker's registered email address
-      subject: 'Verify House Supplier Accounts',
-      text: `Dear ${broker.full_name},
-
-        We are pleased to inform you that your broker verification has been successfully completed.
-         Congratulations, you are now a Verified House Supplier with our organization.
-
-
-         Thank you for your trust and commitment to working with us.
-          We appreciate your valuable contribution and look forward to a long-standing and mutually beneficial relationship.
-
-`
-    };
-
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.log('Error occurred:', error.message);
-        res.status(500).json({ message: 'Failed to send email', error: error.message });
-      } else {
-        console.log('Email sent successfully!');
-        res.status(201).json({ message: 'Broker registered successfully!' });
-      }
-    });
-
-    console.log(`Broker with ID ${brokerId} has been verified.`);
-    res.status(200).json({ message: 'Broker verification updated successfully' });
-  } catch (error) {
-    console.error('Error occurred:', error);
-    res.status(500).json({ message: 'Internal server error', error: error.message });
-  }
-}
-
-
-
 //   a function to login brokers
 async function signIn(req, res) {
   try {
@@ -297,65 +166,55 @@ const getAllBrokers = async (req, res) => {
 };
 
 
-const getBrokerProfile = async (req, res) => {
-  const { brokerId } = req.user
-  const brokerProfile = await BrokerProfile.findOne({ where: { brokerId: brokerId } });
 
-  res.json(brokerProfile)
-}
 
-// const getAllBrokers = async (req, res) => {
-//     const brokers = await Broker.findAll()
-//     res.json(brokers)
+
+// const uploadImageToCloudinary = (imageBuffer) => {
+//   return new Promise((resolve, reject) => {
+//     if (!imageBuffer) {
+//       reject("Image buffer is undefined");
+//       return;
+//     }
+
+//     cloudinary.uploader
+//       .upload_stream((error, result) => {
+//         if (error || !result) {
+//           reject(error);
+//         } else {
+//           resolve(result.url);
+//         }
+//       })
+//       .end(imageBuffer);
+//   });
+// };
+
+
+// const uploadMultipleImage = (images) => {
+//   return new Promise((resolve, reject) => {
+//     const uploads = images.map((base) => uploadImageToCloudinary(base));
+//     console.log("hi there")
+
+//     Promise.all(uploads)
+//       .then((values) => resolve(values))
+//       .catch((err) => reject(err));
+//   });
+// };
+
+
+// const checkProfileAvailability = async (req, res) => {
+//   try {
+//     const { brokerId } = req.body
+//     const broker = await BrokerProfile.findOne({ brokerId: brokerId })
+//     if (!broker) {
+//       return false
+//     }
+//     return true
+//   }
+
+//   catch (err) {
+//     console.log(err)
+//   }
 // }
-
-
-const uploadImageToCloudinary = (imageBuffer) => {
-  return new Promise((resolve, reject) => {
-    if (!imageBuffer) {
-      reject("Image buffer is undefined");
-      return;
-    }
-
-    cloudinary.uploader
-      .upload_stream((error, result) => {
-        if (error || !result) {
-          reject(error);
-        } else {
-          resolve(result.url);
-        }
-      })
-      .end(imageBuffer);
-  });
-};
-
-
-const uploadMultipleImage = (images) => {
-  return new Promise((resolve, reject) => {
-    const uploads = images.map((base) => uploadImageToCloudinary(base));
-    console.log("hi there")
-
-    Promise.all(uploads)
-      .then((values) => resolve(values))
-      .catch((err) => reject(err));
-  });
-};
-
-
-const checkProfileAvailability = async (req, res) => {
-  try {
-    const { brokerId } = req.body
-    const broker = await BrokerProfile.findOne({ brokerId: brokerId })
-    if (!broker) {
-      return false
-    }
-    return true
-  }
-
-  catch (err) {
-    console.log(err)
-  }
-}
 
 
 const viewProfile = async (req, res) => {
@@ -393,4 +252,4 @@ const editProfile = async (req, res) => {
   }
 }
 
-module.exports = { viewProfile, editProfile, signIn, verify, signup, getBrokerProfile, getAllBrokers, updateVerification }
+module.exports = { viewProfile, editProfile, signIn, verify, signup, getAllBrokers }

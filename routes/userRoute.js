@@ -7,7 +7,6 @@ const { validateUserRegistration } = require('../middlewares/userValidation');
 const authenticate = require('../middlewares/auth');
 const multer = require("multer")
 
-
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, "./images")
@@ -25,15 +24,6 @@ router.post('/register', validateUserRegistration, UserController.registerUser);
 // user Login
 router.post('/login', UserController.loginUser);
 
-// recommended status
-router.post('/recommended_status_change/:id', UserController.recommendedStatus);
-
-//change payment status
-router.post("/change_payment_status/:userId", UserController.changePaymentStatus);
-
-//get user status
-router.post("/getUser_status/:userId", UserController.getUserStatus);
-
 // Create User Profile
 router.post('/:id/profile', authenticate, upload.fields([{ name: 'image' }, { name: 'personal_id' }]), UserController.createUserProfile);
 
@@ -48,6 +38,15 @@ router.put('/updated/:id', authenticate, UserController.updateUser);
 
 // Delete User
 router.delete('/:id', authenticate, UserController.deleteUser);
+
+// change activate status
+router.post('/recommended_status_change/:id', UserController.recommendedStatus);
+
+//change payment status
+router.post("/change_payment_status/:userId", UserController.changePaymentStatus);
+
+//get user status
+router.post("/getUser_status/:userId", UserController.getUserStatus);
 
 // forget password
 router.post('/forget-password', UserAuthController.sendGeneratedPassword);

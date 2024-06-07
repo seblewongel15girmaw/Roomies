@@ -4,7 +4,7 @@ const UserProfile = require('../models/userModel');
 
 // save the similarity score with users
 exports.saveSimilarity = async (req, res) => {
-  console.log("I am called")
+  // console.log("I am called")
   const similarityScores = req.body;
 
   try {

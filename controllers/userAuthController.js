@@ -6,6 +6,7 @@ const nodemailer = require('nodemailer');
 const jwt = require("jsonwebtoken")
 require("dotenv").config()
 
+
   // Generate a random password
   function generatePassword() {
     const length = 8;

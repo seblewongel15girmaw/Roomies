@@ -5,7 +5,6 @@ const { viewProfile, updateVerification,editProfile, verify,signup, signIn ,getA
 const router = express.Router()
 const { validateBrokerRegistration } = require('../middlewares/brokerValidation')
 
-
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null,"./images")
@@ -16,7 +15,10 @@ const storage = multer.diskStorage({
 })
 const upload = multer({ storage: storage });
 
+// signup broker
 router.route("/signup").post(upload.single("image"),signup)
+
+// verify brokers phone number
 router.route("/verify").post(verify)
 
 router.route("/login").post(signIn)
@@ -24,11 +26,10 @@ router.route("/login").post(signIn)
 // get all brokers
 router.route("/").get(getAllBrokers);
 
-router.route("/signup").post(upload.single("image"),signUp)
-router.route("/login").post(signIn)
-
+// viewProfile 
 router.route("/getProfile/:id").get(viewProfile)
-// router.route("/createProfile").post(upload.single("image"),createProfile)
+
+// edit profile
 router.route("/editProfile/:id").put(editProfile)
 
 module.exports=router

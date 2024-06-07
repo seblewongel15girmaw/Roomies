@@ -5,7 +5,6 @@ const chatController = require('../controllers/chatController');
 
 // save chat
 router.post('/', chatController.saveChatData);
-
 // get single chats
 router.get('/:sender_id/:receiver_id', chatController.getSingleUserChat);
 

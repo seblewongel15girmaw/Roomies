@@ -64,30 +64,32 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true
   },
-   pets: {
+  pets: {
     type: DataTypes.STRING,
     allowNull: true
-  } ,
+  },
   privacy: {
     type: DataTypes.STRING,
     allowNull: true
-  } ,
+  },
   religious_compatibility: {
     type: DataTypes.STRING,
     allowNull: true
   },
-  
   socialize: {
     type: DataTypes.STRING,
     allowNull: true
   },
-  profile_status: {
+
+  payment_status: {
     type: DataTypes.INTEGER,
-    allowNull: true
+    allowNull: true,
+    defaultValue: 0
   },
   activate_status: {
     type: DataTypes.INTEGER,
-    allowNull: true
+    allowNull: true,
+    defaultValue:0
   },
 });
 

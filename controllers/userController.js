@@ -1,6 +1,7 @@
 const User = require('../models/userModel');
 const Similarity = require('../models/similarityModel');
 // const pool = require('../config/dbConfig'); // Import the MySQL connection pool
+const pushNotificationService = require('../services/pushNotificationServices');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { Sequelize, where } = require("sequelize")

@@ -71,8 +71,10 @@ async function verify(req, res) {
     // Create the user account
     const newBroker = await createUserAccount(full_name, phone_number1,phone_number2, password, address, gender, email, imagePath1,imagePath2);
 
-    // Generate token using userId
-    const token = jwt.sign({ brokerId: newBroker.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    // Generate token using broker id and role= broker
+    // const token = jwt.sign({ brokerId: newBroker.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ brokerId: newBroker.id, role: 'broker' }, process.env.SECRET_KEY, { expiresIn: '1h' });
+
 
     // Remove the session
     sessions.delete(sessionId);
@@ -148,8 +150,14 @@ async function signIn(req, res) {
       return;
     }
 
-    // Generate a token with the broker ID
-    const token = jwt.sign({ brokerId: broker.id }, process.env.SECRET_KEY, { expiresIn: '1h' });
+    // Generate a token with the broker ID only
+    // const token = jwt.sign({ brokerId: broker.id }, process.env.SECRET_KEY, { expiresIn: '1h' });
+
+    // token using broker ID and role = broker
+    const token = jwt.sign({ brokerId: broker.id, role: 'broker' }, process.env.SECRET_KEY, { expiresIn: '1h' });
+
+
+
     // console.log(token);
 
     res.status(200).json({ message: 'Broker logged in successfully', token });

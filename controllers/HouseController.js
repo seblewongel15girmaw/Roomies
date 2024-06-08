@@ -11,7 +11,6 @@ const { Sequelize } = require("sequelize")
 //     api_secret: "MYbbMctHshdYR_3ELvkDpJLQx8o"
 // })
 
-
 // post new house
 const postHouse = async (req, res) => {
   try {

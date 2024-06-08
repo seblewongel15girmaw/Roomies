@@ -20,10 +20,10 @@ const sessions = new Map(); // In-memory session storage
 
 // sign up broker
 async function signup(req, res) {
-  const { full_name, phone_number1,phone_number2, password, address, gender, email } = req.body;
+  const { full_name, phone_number1, phone_number2, password, address, gender, email } = req.body;
 
-  const files = req.file;
-  if (!files) {
+  const files = req.files;
+  if (!files || files.length <= 1) {
     return res.status(400).send("Files are missing");
   }
   // const imagePath = path.join(imagesDirectory, files.filename);
@@ -42,7 +42,7 @@ async function signup(req, res) {
 
   // Store the verification code and user details in a session
   const sessionId = generateSessionId();
-  sessions.set(sessionId, { verificationCode, full_name, phone_number1,phone_number2, password, address, gender, email, imagePath1,imagePath2 });
+  sessions.set(sessionId, { verificationCode, full_name, phone_number1, phone_number2, password, address, gender, email, imagePath1, imagePath2 });
 
   // Send the verification code via SMS
   try {
@@ -66,10 +66,10 @@ async function verify(req, res) {
   // Check if the session exists and the verification code is valid
   const session = sessions.get(sessionId);
   if (session && session.verificationCode === verificationCode) {
-    const { full_name, phone_number1,phone_number2, password, address, gender, email, imagePath1,imagePath2 } = session;
+    const { full_name, phone_number1, phone_number2, password, address, gender, email, imagePath1, imagePath2 } = session;
 
     // Create the user account
-    const newBroker = await createUserAccount(full_name, phone_number1,phone_number2, password, address, gender, email, imagePath1,imagePath2);
+    const newBroker = await createUserAccount(full_name, phone_number1, phone_number2, password, address, gender, email, imagePath1, imagePath2);
 
     // Generate token using userId
     const token = jwt.sign({ brokerId: newBroker.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
@@ -109,7 +109,7 @@ async function createUserAccount(
       gender,
       email,
       profile_pic: profile_pic,
-      broker_personal_id:broker_personal_id
+      broker_personal_id: broker_personal_id
     });
 
     // Save the broker and return the created object
@@ -149,7 +149,7 @@ async function signIn(req, res) {
     }
 
     // Generate a token with the broker ID
-    const token = jwt.sign({ brokerId: broker.id }, process.env.SECRET_KEY, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: broker.id }, process.env.SECRET_KEY, { expiresIn: '1h' });
     // console.log(token);
 
     res.status(200).json({ message: 'Broker logged in successfully', token });
@@ -171,9 +171,6 @@ const getAllBrokers = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
-
-
 
 
 // const uploadImageToCloudinary = (imageBuffer) => {
@@ -208,20 +205,40 @@ const getAllBrokers = async (req, res) => {
 // };
 
 
-// const checkProfileAvailability = async (req, res) => {
-//   try {
-//     const { brokerId } = req.body
-//     const broker = await BrokerProfile.findOne({ brokerId: brokerId })
-//     if (!broker) {
-//       return false
-//     }
-//     return true
-//   }
+const checkProfileAvailability = async (req, res) => {
+  try {
+    const { brokerId } = req.body
+    const broker = await BrokerProfile.findOne({ brokerId: brokerId })
+    if (!broker) {
+      return false
+    }
+    return true
+  }
 
-//   catch (err) {
-//     console.log(err)
-//   }
-// }
+  catch (err) {
+    console.log(err)
+  }
+}
+
+
+const getAllBrokerHouse = async (req, res) => {
+  try {
+    const id = req.params
+    const houseList = await House.findAll({
+      include: Image,
+      where: {
+        brokerId: id
+      },
+    })
+
+    res.json(houseList);
+  }
+  catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'An error occurred while fetching all broker houses.' });
+  }
+}
+
 
 // view  brokers profile
 const viewProfile = async (req, res) => {
@@ -259,4 +276,4 @@ const editProfile = async (req, res) => {
   }
 }
 
-module.exports = { viewProfile, editProfile, signIn, verify, signup, getAllBrokers }
+module.exports = { viewProfile, editProfile, signIn, verify, signup, getAllBrokers, getAllBrokerHouse }

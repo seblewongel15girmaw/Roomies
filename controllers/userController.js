@@ -81,8 +81,6 @@ exports.loginUser = async (req, res) => {
 
 
 
-
-
 // Create User Profile
 exports.createUserProfile = async (req, res) => {
   try {

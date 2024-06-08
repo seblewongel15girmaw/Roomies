@@ -28,10 +28,23 @@ router.post('/login', UserController.loginUser);
 router.post('/:id/profile', authenticate, upload.fields([{ name: 'image' }, { name: 'personal_id' }]), UserController.createUserProfile);
 
 // Get All Users
-router.get('/',authenticate, UserController.getAllUsers);
+// router.get('/',authenticate, UserController.getAllUsers);
 
 //  get single users
 router.get('/:id', UserController.getUser);
+
+
+// get all users
+router.get('/', authenticate, (req, res, next) => {
+    console.log('Role in route handler:', req.role);
+  
+    if (req.role === 'user') {
+      UserController.getAllUsers(req, res, next);
+    } else {
+      return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
+    }
+  });
+  
 
 // Update User Profile
 router.put('/updated/:id', authenticate, UserController.updateUser);

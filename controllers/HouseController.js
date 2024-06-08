@@ -12,7 +12,6 @@ const User = require("../models/userModel")
 //     api_secret: "MYbbMctHshdYR_3ELvkDpJLQx8o"
 // })
 
-
 // post new house
 const postHouse = async (req, res) => {
   try {

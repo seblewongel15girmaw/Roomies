@@ -149,8 +149,15 @@ async function signIn(req, res) {
       return;
     }
 
-    // Generate a token with the broker ID
-    const token = jwt.sign({ userId: broker.id }, process.env.SECRET_KEY, { expiresIn: '1h' });
+    // Generate a token with the broker ID only
+    // const token = jwt.sign({ brokerId: broker.id }, process.env.SECRET_KEY, { expiresIn: '1h' });
+
+    // token using broker ID and role = broker
+    const token = jwt.sign({ brokerId: broker.id, role: 'broker' }, process.env.SECRET_KEY, { expiresIn: '1h' });
+
+
+
+
     // console.log(token);
 
     res.status(200).json({ message: 'Broker logged in successfully', token });

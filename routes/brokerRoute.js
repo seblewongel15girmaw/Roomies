@@ -4,6 +4,7 @@ const multer = require("multer")
 const { viewProfile, editProfile, verify, signup, signIn, getAllBrokers } = require("../controllers/brokerController")
 const router = express.Router()
 const BrokerAuthController = require('../controllers/brokerAuthController');
+const authenticate = require('../middlewares/auth');
 
 const { validateBrokerRegistration } = require('../middlewares/brokerValidation');
 const authenticate = require("../middlewares/auth");
@@ -40,7 +41,8 @@ router.route("/editProfile/:id").put(authenticate, editProfile)
 // forget password
 router.post('/forget_password', authenticate, BrokerAuthController.sendGeneratedPassword);
 
-// change password
-router.post('/change_password/:id', authenticate, BrokerAuthController.changePassword);
+// change passwor
+router.post('/change_password/:id',authenticate, BrokerAuthController.changePassword);
+
 
 module.exports = router

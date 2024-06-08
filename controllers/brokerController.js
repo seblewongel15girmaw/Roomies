@@ -1,5 +1,6 @@
 const mysql = require("mysql2")
 const Broker = require("../models/brokerModel")
+const { House, Image } = require("../models/houseModel")
 const bcrypt = require("bcrypt")
 const nodemailer = require('nodemailer');
 const jwt = require("jsonwebtoken")
@@ -71,10 +72,8 @@ async function verify(req, res) {
     // Create the user account
     const newBroker = await createUserAccount(full_name, phone_number1, phone_number2, password, address, gender, email, imagePath1, imagePath2);
 
-    // Generate token using broker id and role= broker
-    // const token = jwt.sign({ brokerId: newBroker.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    const token = jwt.sign({ brokerId: newBroker.id, role: 'broker' }, process.env.SECRET_KEY, { expiresIn: '1h' });
-
+    // Generate token using userId
+    const token = jwt.sign({ userId: newBroker.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     // Remove the session
     sessions.delete(sessionId);
@@ -232,14 +231,13 @@ const checkProfileAvailability = async (req, res) => {
 
 const getAllBrokerHouse = async (req, res) => {
   try {
-    const id = req.params
+    // const id = req.params
     const houseList = await House.findAll({
       include: Image,
-      where: {
-        brokerId: id
-      },
+      // where: {
+      //   brokerId: id
+      // },
     })
-
     res.json(houseList);
   }
   catch (err) {

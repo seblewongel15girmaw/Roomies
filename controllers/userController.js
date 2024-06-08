@@ -361,7 +361,7 @@ exports.getUserStatus = async (req, res) => {
       return res.status(400).json({ error: "User ID is required" });
     }
     const user = await User.findOne({
-      attributes: ['activate_status', 'payment_status'],
+      attributes: ['profile_status', 'payment_status'],
       where: { id: userId }
     });
     res.json(user);

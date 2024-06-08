@@ -1,5 +1,6 @@
 const express = require("express")
-const { postHouse, editHouse, deleteHouse, getAllHouses, getAllUserBasedHouses,viewSingleHouse,getHousesBasedOnRooms } = require("../controllers/HouseController")
+const { postHouse, editHouse, deleteHouse, getAllHouses, getAllUserBasedHouses, viewSingleHouse, getHousesBasedOnRooms } = require("../controllers/HouseController")
+const {getAllBrokerHouse}= require("../controllers/brokerController")
 const multer = require("multer")
 
 const storage = multer.diskStorage({
@@ -17,16 +18,18 @@ const router = express.Router()
 
 
 // post new house
-router.route("/posthouse").post(upload.array("images", 6),postHouse)
+router.route("/posthouse/:id").post(upload.array("images", 6),postHouse)
 
 // edit house
 router.route("/edithouse").put(editHouse)
 
 // delete house 
-router.route("/deletehouse").delete(deleteHouse)
+router.route("/deletehouse/:id").delete(deleteHouse)
 
 // get all house based on user profile status
 router.route("/getallhouse/:id").get(getAllUserBasedHouses)
+
+router.route("/all_broker_house").get(getAllBrokerHouse);
 
 // get all house based on number of rooms
 router.route("/get_all_house_room_based/:id").get(getHousesBasedOnRooms)

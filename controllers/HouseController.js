@@ -4,6 +4,7 @@ const path = require("path")
 const imagesDirectory = path.join(__dirname, "..", 'images');
 const { Op } = require("sequelize")
 const { Sequelize } = require("sequelize")
+const User = require("../models/userModel")
 
 // cloudinary.config({
 //     cloud_name: "dqdhs44nq",
@@ -15,7 +16,7 @@ const { Sequelize } = require("sequelize")
 // post new house
 const postHouse = async (req, res) => {
   try {
-    const { brokerId } = req.user
+    const { brokerId } = req.params
     const { location, price, description, numberOfRoom } = req.body
     const files = req.files;
     if (!files || files.length === 0) {
@@ -24,6 +25,7 @@ const postHouse = async (req, res) => {
     const house = await House.create({
       location: location, numberOfRoom: numberOfRoom,
       price: price, description: description,
+      brokerId: brokerId
     })
 
     const imagePaths = req.files.map(file => path.join(imagesDirectory, file.filename));
@@ -59,24 +61,23 @@ const editHouse = async (req, res) => {
 
 }
 
-
 // delete house
 const deleteHouse = async (req, res) => {
   try {
-    const { houseId } = req.params
-    const isValid = checkOwnership(houseId)
-    if (!isValid) {
-      return res.json("unauthorized access")
-    }
+    const { id } = req.params
+    // const isValid = checkOwnership(houseId)
+    // if (!isValid) {
+    //   return res.json("unauthorized access")
+    // }
 
-    const house = await House.findByPk(houseId, {
+    const house = await House.findByPk(id, {
       include: Image
     });
 
     // Delete the house and associated images
     await house.destroy();
 
-    res.json(isValid)
+    res.json("success")
 
   }
   catch (err) {
@@ -199,7 +200,7 @@ const getHousesBasedOnRooms = async (req, res) => {
         },
         include: Image,
       });
-
+      console.log(houseList);
       res.json(houseList);
     }
   } catch (err) {

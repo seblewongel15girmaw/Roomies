@@ -1,7 +1,7 @@
 
 const express = require("express")
 const multer = require("multer")
-const { viewProfile, editProfile, verify, signup, signIn, getAllBrokers, getAllBrokerHouse } = require("../controllers/brokerController")
+const { viewProfile, editProfile, verify, signup, signIn, getAllBrokers } = require("../controllers/brokerController")
 const router = express.Router()
 const BrokerAuthController = require('../controllers/brokerAuthController');
 
@@ -36,7 +36,6 @@ router.route("/getProfile/:id").get(authenticate, viewProfile)
 // edit profile
 router.route("/editProfile/:id").put(authenticate, editProfile)
 
-router.route("/all_broker_house/:id").get(authenticate, getAllBrokerHouse);
 
 // forget password
 router.post('/forget_password', authenticate, BrokerAuthController.sendGeneratedPassword);

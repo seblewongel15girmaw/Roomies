@@ -7,7 +7,7 @@ const BrokerAuthController = require('../controllers/brokerAuthController');
 const authenticate = require('../middlewares/auth');
 
 const { validateBrokerRegistration } = require('../middlewares/brokerValidation');
-const authenticate = require("../middlewares/auth");
+
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {

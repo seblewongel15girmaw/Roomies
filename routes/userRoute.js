@@ -26,7 +26,7 @@ router.post('/login', UserController.loginUser);
 
 // Create User Profile
 // router.post('/:id/profile', authenticate, upload.fields([{ name: 'image' }, { name: 'personal_id' }]), UserController.createUserProfile);
-router.get('/:id/profile', authenticate,upload.fields([{ name: 'image' }, { name: 'personal_id' }]),(req, res, next) => {
+router.post('/:id/profile', authenticate,upload.fields([{ name: 'image' }, { name: 'personal_id' }]),(req, res, next) => {
   // console.log('Role in route handler:', req.role);
   if (req.role === 'user') {
     UserController.createUserProfile(req, res, next);
@@ -69,7 +69,7 @@ router.delete('/:id', authenticate, UserController.deleteUser);
 
 // change activate status
 // router.post('/recommended_status_change/:id', UserController.recommendedStatus);
-router.get('/recommended_status_change/:id', authenticate,(req, res, next) => {
+router.post('/recommended_status_change/:id', authenticate,(req, res, next) => {
   // console.log('Role in route handler:', req.role);
   if (req.role === 'user') {
     UserController.recommendedStatus(req, res, next);
@@ -80,7 +80,7 @@ router.get('/recommended_status_change/:id', authenticate,(req, res, next) => {
 
 //change payment status
 // router.post("/change_payment_status/:userId", UserController.changePaymentStatus);
-router.get('/change_payment_status/:userId', authenticate,(req, res, next) => {
+router.post('/change_payment_status/:userId', authenticate,(req, res, next) => {
   // console.log('Role in route handler:', req.role);
   if (req.role === 'user') {
     UserController.changePaymentStatus(req, res, next);
@@ -105,7 +105,7 @@ router.post('/forget-password', UserAuthController.sendGeneratedPassword);
 
 // change password
 // router.post('/change-password/:id', authenticate, UserAuthController.changePassword);
-router.get('/change-password/:id', authenticate,(req, res, next) => {
+router.post('/change-password/:id', authenticate,(req, res, next) => {
   // console.log('Role in route handler:', req.role);
   if (req.role === 'user') {
     UserController.changePassword(req, res, next);

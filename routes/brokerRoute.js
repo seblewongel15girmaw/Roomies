@@ -21,7 +21,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // signup broker
-router.route("/signup").post(upload.fields([{ name: 'profile_pic' }, { name: 'broker_personal_id' }]), signup)
+router.route("/signup").post(validateBrokerRegistration,upload.fields([{ name: 'profile_pic' }, { name: 'broker_personal_id' }]), signup)
 
 // verify brokers phone number
 router.route("/verify").post(verify)
@@ -32,17 +32,41 @@ router.route("/login").post(signIn)
 router.route("/").get(authenticate,getAllBrokers);
 
 // viewProfile 
-router.route("/getProfile/:id").get(authenticate, viewProfile)
+// router.route("/getProfile/:id").get(authenticate, viewProfile)
+router.get('/getProfile/:id', authenticate,(req, res, next) => {
+    // console.log('Role in route handler:', req.role);
+    if (req.role === 'broker') {
+      viewProfile(req, res, next);
+    } else {
+      return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
+    }
+  });
 
 // edit profile
-router.route("/editProfile/:id").put(authenticate, editProfile)
+// router.route("/editProfile/:id").put(authenticate, editProfile)
+router.put('/editProfile/:id', authenticate,(req, res, next) => {
+    // console.log('Role in route handler:', req.role);
+    if (req.role === 'broker') {
+      editProfile(req, res, next);
+    } else {
+      return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
+    }
+  });
 
 
 // forget password
 router.post('/forget_password', authenticate, BrokerAuthController.sendGeneratedPassword);
 
 // change passwor
-router.post('/change_password/:id',authenticate, BrokerAuthController.changePassword);
+// router.post('/change_password/:id',authenticate, BrokerAuthController.changePassword);
+router.post('/change_password/:id', authenticate,(req, res, next) => {
+    // console.log('Role in route handler:', req.role);
+    if (req.role === 'user') {
+        BrokerAuthController.changePassword(req, res, next);
+    } else {
+      return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
+    }
+  });
 
 
 module.exports = router

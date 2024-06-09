@@ -109,10 +109,7 @@ const Broker = sequelize.define('Broker', {
     }
   }
   ,
-  // verify: {
-  //   type: DataTypes.INTEGER,
-  //   allowNull: true
-  // },
+  
 });
 Broker.getBrokerByEmail = async function (email) {
   return Broker.findOne({

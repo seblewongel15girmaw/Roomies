@@ -23,7 +23,7 @@ const router = express.Router()
 
 // post new house
 // router.route("/posthouse/:id").post(upload.array("images", 6),postHouse)
-router.post('/posthouse/:id', authenticate, validateHouseRegistration,upload.array("images", 6),(req, res, next) => {
+router.post('/posthouse/:id', authenticate,upload.array("images", 6),(req, res, next) => {
     // console.log('Role in route handler:', req.role);
     if (req.role === 'broker') {
         postHouse(req, res, next);

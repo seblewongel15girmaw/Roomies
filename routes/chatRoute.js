@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const chatController = require('../controllers/chatController');
+const authenticate = require('../middlewares/auth');
 
 // save chat
 // router.post('/', chatController.saveChatData);

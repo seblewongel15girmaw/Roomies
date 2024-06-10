@@ -50,7 +50,7 @@ const Broker = sequelize.define('Broker', {
     }
   },
   phone_number1: {
-    type: DataTypes.BIGINT,
+    type: DataTypes.STRING,
     allowNull: false,
     unique: true,
     validate: {
@@ -63,14 +63,10 @@ const Broker = sequelize.define('Broker', {
     }
   },
   phone_number2: {
-    type: DataTypes.BIGINT,
+    type: DataTypes.STRING,
     allowNull: true,
     unique: true,
-    validate: {
-      isNumeric: {
-        msg: 'Phone number 2 must be a numeric value'
-      }
-    }
+    
   },
   password: {
     type: DataTypes.STRING,

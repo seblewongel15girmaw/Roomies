@@ -73,7 +73,9 @@ async function verify(req, res) {
     const newBroker = await createUserAccount(full_name, phone_number1, phone_number2, password, address, gender, email, imagePath1, imagePath2);
 
     // Generate token using userId
-    const token = jwt.sign({ userId: newBroker.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    // const token = jwt.sign({ userId: newBroker.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ brokerId: newBroker.id, role: 'broker' }, process.env.SECRET_KEY, { expiresIn: '1h' });
+
 
     // Remove the session
     sessions.delete(sessionId);

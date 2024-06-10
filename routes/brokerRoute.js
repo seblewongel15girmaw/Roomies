@@ -21,7 +21,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // signup broker
-router.route("/signup").post(validateBrokerRegistration,upload.fields([{ name: 'profile_pic' }, { name: 'broker_personal_id' }]), signup)
+router.route("/signup").post(upload.fields([{ name: 'profile_pic' }, { name: 'broker_personal_id' }]), signup)
 
 // verify brokers phone number
 router.route("/verify").post(verify)

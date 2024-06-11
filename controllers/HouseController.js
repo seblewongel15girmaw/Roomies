@@ -15,7 +15,7 @@ const User = require("../models/userModel")
 // post new house
 const postHouse = async (req, res) => {
   try {
-    const { brokerId } = req.params
+    const { id } = req.params
     const { location, price, description, numberOfRoom } = req.body
     const files = req.files;
     if (!files || files.length === 0) {
@@ -24,7 +24,7 @@ const postHouse = async (req, res) => {
     const house = await House.create({
       location: location, numberOfRoom: numberOfRoom,
       price: price, description: description,
-      brokerId: brokerId
+      brokerId: id
     })
 
     const imagePaths = req.files.map(file => path.join(imagesDirectory, file.filename));

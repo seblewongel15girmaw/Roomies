@@ -233,7 +233,7 @@ const checkProfileAvailability = async (req, res) => {
 
 const getAllBrokerHouse = async (req, res) => {
   try {
-    const id = req.params
+    const {id} = req.params
     const houseList = await House.findAll({
       include: Image,
       where: {

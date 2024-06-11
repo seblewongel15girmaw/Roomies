@@ -35,7 +35,7 @@ router.post('/posthouse/:id', authenticate,upload.array("images", 6),(req, res, 
 
 // edit house
 // router.route("/edithouse").put(editHouse)
-router.put('/edithouse', authenticate,(req, res, next) => {
+router.put('/edithouse/:id', authenticate,(req, res, next) => {
     // console.log('Role in route handler:', req.role);
     if (req.role === 'broker') {
         editHouse(req, res, next);
@@ -69,7 +69,7 @@ router.get('/getallhouse/:id', authenticate,(req, res, next) => {
 
 //   just get all house
 // router.route("/all_broker_house").get(getAllBrokerHouse);
-router.get('/all_broker_house', authenticate,(req, res, next) => {
+router.get('/all_broker_house/:id', authenticate,(req, res, next) => {
     // console.log('Role in route handler:', req.role);
     if (req.role === 'user') {
         getAllBrokerHouse(req, res, next);
@@ -90,7 +90,7 @@ router.get('/get_all_house_room_based/:id', authenticate,(req, res, next) => {
   });
 
 // just get all house
-// router.route("/getallhouse").get(getAllHouses)
+router.route("/getallhouse").get(getAllHouses)
 
 
 // router.route("/gethousedetail/:id").get(viewSingleHouse)

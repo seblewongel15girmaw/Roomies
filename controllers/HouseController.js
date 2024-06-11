@@ -31,7 +31,7 @@ const postHouse = async (req, res) => {
     const createdImages = await Promise.all(
       imagePaths.map(imageUrl => Image.create({ imageUrl, houseId: house.houseId }))
     );
-    res.json({ "house": house, "images": createdImages })
+    res.status(201).json({ "house": house, "images": createdImages })
   }
   catch (err) {
     console.log(err)
@@ -171,9 +171,7 @@ const getHousesBasedOnRooms = async (req, res) => {
       // If the user's profile_status is 0, fetch all the houses that match the number of rooms
       const houseList = await House.findAll({
         where: {
-          numberOfRoom: {
-            [Op.lte]: no_of_rooms, // Filter houses with number of rooms less than or equal to the requested number
-          },
+          numberOfRoom: no_of_rooms,
         },
         include: Image,
       });
@@ -184,16 +182,14 @@ const getHousesBasedOnRooms = async (req, res) => {
 
       const houseList = await House.findAll({
         where: {
-          [Op.or]: [
+          [Op.and]: [
             {
               price: {
                 [Op.lte]: budget, // Filter houses with price less than or equal to the user's budget
               },
             },
             {
-              numberOfRoom: {
-                [Op.lte]: no_of_rooms, // Filter houses with number of rooms less than or equal to the requested number
-              },
+              numberOfRoom: no_of_rooms, // Filter houses with number of rooms equal to the requested number
             },
           ],
         },

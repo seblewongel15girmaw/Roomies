@@ -1,57 +1,22 @@
 const User = require('../models/userModel');
 const Similarity = require('../models/similarityModel');
-// const pool = require('../config/dbConfig'); // Import the MySQL connection pool
-const pushNotificationService = require('../services/pushNotificationServices');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
-
 const { Sequelize, where } = require("sequelize")
 const path = require('path');
 const axios = require('axios')
 const imagesDirectory = path.join(__dirname, "..", 'images');
+var admin = require("firebase-admin");
 
-// register User
-// exports.registerUser = async (req, res) => {
-//   try {
-//     const { full_name, username, email, password } = req.body;
-
-
-//     // Check if the username or email already exists in the database
-//     const existingUser = await User.findOne({
-//       where: {
-//         [Sequelize.Op.or]: [{ username }, { email }]
-//       }
-//     });
-
-//     if (existingUser) {
-//       res.status(400).json({ message: 'Username or email already exists' });
-//       return;
-//     }
-
-//     const hashedPassword = await bcrypt.hash(password, 10);
-
-//     const userData = {
-//       full_name,
-//       username,
-//       email,
-//       password: hashedPassword,
-//       profile_status: 0
-
-//     };
-
-//     const user = await User.create(userData);
-
-//     res.status(201).json({ message: 'User registered successfully', userId: user.id });
-//   } catch (error) {
-//     console.error('Error registering user:', error);
-//     res.status(500).json({ message: 'Internal server error', error: error.message });
-//   }
-// };
+var serviceAccount = require('../config/serviceAccountKey.json');
+const certPath = admin.credential.cert(serviceAccount);
+admin.initializeApp({
+  credential: certPath
+});
 
 // user regustration with email verification
-
 exports.registerUser = async (req, res) => {
   try {
     const { full_name,username, email, password } = req.body;
@@ -213,7 +178,7 @@ exports.loginUser = async (req, res) => {
 exports.createUserProfile = async (req, res) => {
   try {
     const userId = req.params.id;
-    const { gender, religion, age, budget, image, personal_id, bio, phone_number, address, job_status, smoking, pets, privacy, religious_compatibility, socialize } = req.body;
+    const { gender, religion, age, budget, image, personal_id, bio, phone_number, address, job_status, smoking, pets, privacy, religious_compatibility, socialize,fcm_token } = req.body;
     const files = req.files;
     if (!files || files.length === 0) {
       return res.status(400).send("Files are missing");
@@ -244,6 +209,7 @@ exports.createUserProfile = async (req, res) => {
     user.privacy = privacy;
     user.religious_compatibility = religious_compatibility;
     user.socialize = socialize;
+    user.fcm_token = fcm_token;
     user.profile_status = 1;
     user.activate_status = 1;
     await user.save(); // Save the updated user profile
@@ -304,6 +270,31 @@ exports.createUserProfile = async (req, res) => {
             // User does not exist, create a new record
             await Similarity.create({ userId, similarityScores });
           }
+
+          //  Send notifications to existing users if they have similarity with the new user
+          // const newUserId = req.params.id;
+          // if (similarityScores[newUserId]) {
+          //   const otherUser = await User.findByPk(userId);
+          //   if (otherUser && otherUser.fcm_token) {
+          //     await sendPushNotification(otherUser.fcm_token, {
+          //       title: 'New Recommended User',
+          //       body: `A new user is recommended for you.`
+          //     });
+          //   }
+          // }
+
+          for (const [otherUserId, similarityScore] of Object.entries(similarityScores)) {
+            if (similarityScore > 0 && otherUserId == newUserId) {
+              const otherUser = await User.findByPk(userId);
+              if (otherUser && otherUser.fcm_token) {
+                await sendPushNotification(otherUser.fcm_token, {
+                  title: 'New Recommended User',
+                  body: `A new user is recommended for you.`
+                });
+              }
+            }
+          }
+        
         }
 
 
@@ -315,7 +306,9 @@ exports.createUserProfile = async (req, res) => {
       console.log(error)
     })
 
-    // Send the user data and other users' data in the response
+    // send notification
+
+    
     res.status(200).json({
       message: 'User profile created successfully',
       userData: userData
@@ -323,6 +316,25 @@ exports.createUserProfile = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+};
+
+// notification
+const sendPushNotification = async (fcmToken, message) => {
+  try {
+    let notificationMessage = {
+      notification: {
+        title: message.title,
+        body: message.body
+      },
+      
+      token: fcmToken
+    };
+
+    await admin.messaging().send(notificationMessage);
+    console.log('Notification sent successfully');
+  } catch (error) {
+    console.error('Error sending notification:', error);
   }
 };
 

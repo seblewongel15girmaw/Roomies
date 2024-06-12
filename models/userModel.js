@@ -85,6 +85,10 @@ const User = sequelize.define('User', {
     allowNull: false,
     defaultValue: 0
   },
+  fcm_token: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   verificationToken: {
     type: DataTypes.STRING,
     allowNull: false

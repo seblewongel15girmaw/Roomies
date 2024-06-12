@@ -44,9 +44,11 @@ const houseRoutes = require('./routes/houseRoute');
 const feedbackRoutes = require('./routes/feedbackRoute');
 const adminRoutes = require('./routes/adminRoute');
 const dashboardRoutes = require('./routes/dashboardRoute.js');
+// const notififcationRoute = require('./routes/test.js');
 
 const similarityRoute = require('./routes/similarityRoute.js')
 
+// app.use('/api/not', notififcationRoute);
 
 app.use('/api/users', userRoutes);
 app.use('/api/brokers', brokerRoutes);

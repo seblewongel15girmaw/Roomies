@@ -80,6 +80,15 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true
   },
+  verified: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0
+  },
+  verificationToken: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
   profile_status: {
     type: DataTypes.INTEGER,
     allowNull: true,

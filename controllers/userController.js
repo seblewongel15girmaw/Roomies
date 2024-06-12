@@ -3,46 +3,164 @@ const Similarity = require('../models/similarityModel');
 // const pool = require('../config/dbConfig'); // Import the MySQL connection pool
 const pushNotificationService = require('../services/pushNotificationServices');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+
 const { Sequelize, where } = require("sequelize")
 const path = require('path');
 const axios = require('axios')
 const imagesDirectory = path.join(__dirname, "..", 'images');
 
 // register User
+// exports.registerUser = async (req, res) => {
+//   try {
+//     const { full_name, username, email, password } = req.body;
+
+
+//     // Check if the username or email already exists in the database
+//     const existingUser = await User.findOne({
+//       where: {
+//         [Sequelize.Op.or]: [{ username }, { email }]
+//       }
+//     });
+
+//     if (existingUser) {
+//       res.status(400).json({ message: 'Username or email already exists' });
+//       return;
+//     }
+
+//     const hashedPassword = await bcrypt.hash(password, 10);
+
+//     const userData = {
+//       full_name,
+//       username,
+//       email,
+//       password: hashedPassword,
+//       profile_status: 0
+
+//     };
+
+//     const user = await User.create(userData);
+
+//     res.status(201).json({ message: 'User registered successfully', userId: user.id });
+//   } catch (error) {
+//     console.error('Error registering user:', error);
+//     res.status(500).json({ message: 'Internal server error', error: error.message });
+//   }
+// };
+
+// user regustration with email verification
+
 exports.registerUser = async (req, res) => {
   try {
-    const { full_name, username, email, password } = req.body;
+    const { full_name,username, email, password } = req.body;
 
-
-    // Check if the username or email already exists in the database
-    const existingUser = await User.findOne({
-      where: {
-        [Sequelize.Op.or]: [{ username }, { email }]
-      }
-    });
-
+    // Check if the user already exists
+    const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      res.status(400).json({ message: 'Username or email already exists' });
-      return;
+      return res.status(400).json({ message: 'User with this email already exists' });
     }
 
+    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const userData = {
-      full_name,
+    //  Generate a random verification token
+    const verificationToken = crypto.randomBytes(20).toString('hex');
+
+
+    // Create the new user
+    const user = await User.create({
+            full_name,
       username,
       email,
       password: hashedPassword,
-      profile_status: 0
+      verified: 0,
+      profile_status: 0,
+      verificationToken: verificationToken,
+    });
 
-    };
+    // Store the user's email in the session
+    // req.session.email = email;
 
-    const user = await User.create(userData);
+    // Send the verification email
+    await sendVerificationEmail(req, email, verificationToken);
 
-    res.status(201).json({ message: 'User registered successfully', userId: user.id });
+
+    res.status(201).json({ message: 'User registered successfully, and verify your email' });
   } catch (error) {
     console.error('Error registering user:', error);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+};
+
+// send verification email
+const sendVerificationEmail = async (req, email,verificationToken) => {
+  try {
+  
+    // Define the email template
+    const emailTemplate = `
+      <html>
+    <body>
+      <h1>Verify your email</h1>
+      <p>Please click the button below to verify your email:</p>
+      <a href="http://localhost:3000/api/users/verify?token=${verificationToken}">
+        <button>Verify Email</button>
+      </a>
+    </body>
+  </html>
+
+    `;
+
+    // Configure the email options
+    const mailOptions = {
+      from: process.env.EMAIL_USERNAME,
+      to: email,
+      subject: 'Verify your email',
+      html: emailTemplate
+    };
+
+    // Send the email
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error('Error sending verification email:', error);
+    throw error;
+  }
+};
+
+// Create a transporter object
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+        secure:'true',
+        auth: {
+          user: process.env.EMAIL_USERNAME,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+});
+
+// verify users email
+exports.verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.query;
+  
+    console.log('Received token:', token);
+
+    // Find the user by the verification token
+    const user = await User.findOne({ where: { verificationToken: token } });
+
+    if (!user) {
+      console.log('User not found:', token);
+      return res.status(404).json({ message: 'Invalid verification token' });
+    }
+
+    // Update the user's verified status and clear the verification token from the session
+    user.verified = 1;
+    // user.verificationToken = null;
+    await user.save();
+
+    res.status(200).json({ message: 'Email verified successfully' });
+  } catch (error) {
+    console.error('Error verifying email:', error);
     res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 };
@@ -54,6 +172,13 @@ exports.loginUser = async (req, res) => {
 
     // Retrieve the user from the database
     const user = await User.getUserByUsername(username);
+
+    // Check if the user is verified (1 = verified, 0 = not verified)
+    if (user.verified === 0) {
+      res.status(401).json({ message: 'User is not verified' });
+      return;
+    }
+
 
     if (!user) {
       res.status(401).json({ message: 'Invalid username or password' });

@@ -25,6 +25,11 @@ const House = sequelize.define("House", {
   description: {
     type: DataTypes.STRING,
   },
+  rental_status: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0
+  },
 
 })
 

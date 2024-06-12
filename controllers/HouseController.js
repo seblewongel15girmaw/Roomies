@@ -23,7 +23,7 @@ const postHouse = async (req, res) => {
     }
     const house = await House.create({
       location: location, numberOfRoom: numberOfRoom,
-      price: price, description: description,
+      price: price, description: description,rental_status:0,
       brokerId: id
     })
 
@@ -38,6 +38,35 @@ const postHouse = async (req, res) => {
   }
 }
 
+
+// change house status
+
+const changeHouseStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Retrieve the house from the database
+    const house = await House.findByPk(id);
+
+    if (!house) {
+      return res.status(404).json({ message: 'House not found' });
+    }
+
+    // Toggle the rental_status of the house
+    if (house.rental_status === 0) {
+      house.rental_status = 1;
+    } else {
+      house.rental_status = 0;
+    }
+
+    await house.save();
+
+    res.status(200).json({ message: 'House status updated successfully', house });
+  } catch (err) {
+    console.error('Error changing house status:', err);
+    res.status(500).json({ message: 'Internal server error', error: err.message });
+  }
+};
 
 // edit house
 const editHouse = async (req, res) => {
@@ -118,7 +147,11 @@ const viewSingleHouse = async (req, res) => {
 const getAllHouses = async (req, res) => {
   try {
 
-    const houseList = await House.findAll({ include: Image })
+    const houseList = await House.findAll({ 
+      where: {
+        rental_status: 0,
+      },
+      include: Image })
     res.json(houseList)
 
   }
@@ -136,7 +169,12 @@ const getAllUserBasedHouses = async (req, res) => {
 
     if (user.profile_status === 0) {
       // If the user's profile_status is 0, fetch all the houses
-      const houseList = await House.findAll({ include: Image });
+      const houseList = await House.findAll({
+        where: {
+          rental_status: 0,
+        },
+         include: Image
+         });
       res.json(houseList);
     } else {
       // If the user's profile_status is 1, find houses within their budget
@@ -147,6 +185,7 @@ const getAllUserBasedHouses = async (req, res) => {
           price: {
             [Op.lte]: budget, // Filter houses with price less than or equal to the user's budget
           },
+          rental_status: 0, // Filter houses with rental_status 0
         },
         include: Image,
       });
@@ -172,6 +211,7 @@ const getHousesBasedOnRooms = async (req, res) => {
       const houseList = await House.findAll({
         where: {
           numberOfRoom: no_of_rooms,
+          rental_status: 0,
         },
         include: Image,
       });
@@ -190,6 +230,7 @@ const getHousesBasedOnRooms = async (req, res) => {
             },
             {
               numberOfRoom: no_of_rooms, // Filter houses with number of rooms equal to the requested number
+              rental_status: 0,
             },
           ],
         },
@@ -222,5 +263,5 @@ const getHousesBasedOnRooms = async (req, res) => {
     }
 } */
 
-module.exports = { postHouse, editHouse, deleteHouse, viewSingleHouse, getAllHouses, getHousesBasedOnRooms, getAllUserBasedHouses }
+module.exports = { postHouse, editHouse, changeHouseStatus,deleteHouse, viewSingleHouse, getAllHouses, getHousesBasedOnRooms, getAllUserBasedHouses }
 

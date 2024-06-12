@@ -1,5 +1,5 @@
 const express = require("express")
-const { postHouse, editHouse, deleteHouse, getAllHouses, getAllUserBasedHouses, viewSingleHouse, getHousesBasedOnRooms } = require("../controllers/HouseController")
+const { postHouse, editHouse, changeHouseStatus,deleteHouse, getAllHouses, getAllUserBasedHouses, viewSingleHouse, getHousesBasedOnRooms } = require("../controllers/HouseController")
 const {getAllBrokerHouse}= require("../controllers/brokerController")
 const multer = require("multer")
 const authenticate = require('../middlewares/auth');
@@ -31,6 +31,19 @@ router.post('/posthouse/:id', authenticate,upload.array("images", 6),(req, res, 
       return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
     }
   });
+
+
+
+
+// change house rental status
+// router.route("/house_status/:id").post(changeHouseStatus);
+router.post('/house_status/:id', authenticate,(req, res, next) => {
+  if (req.role === 'broker') {
+    changeHouseStatus(req, res, next);
+  } else {
+    return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
+  }
+});
 
 
 // edit house

@@ -45,8 +45,6 @@ exports.registerUser = async (req, res) => {
       verificationToken: verificationToken,
     });
 
-    // Store the user's email in the session
-    // req.session.email = email;
 
     // Send the verification email
     await sendVerificationEmail(req, email, verificationToken);
@@ -54,6 +52,13 @@ exports.registerUser = async (req, res) => {
 
     res.status(201).json({ message: 'User registered successfully, and verify your email' });
   } catch (error) {
+
+    // Handle Sequelize-specific errors
+    if (error.name === 'SequelizeValidationError') {
+      const errors = error.errors.map((err) => err.message);
+      return res.status(400).json({ errors });
+    }
+
     console.error('Error registering user:', error);
     res.status(500).json({ message: 'Internal server error', error: error.message });
   }
@@ -170,6 +175,7 @@ exports.loginUser = async (req, res) => {
     console.error('Error logging in user:', error);
     res.status(500).json({ message: 'Internal server error', error: error.message });
   }
+  
 };
 
 

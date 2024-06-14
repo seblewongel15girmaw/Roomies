@@ -80,11 +80,10 @@ router.get('/getallhouse/:id', authenticate,(req, res, next) => {
   });
 
 
-//   just get all house
+//   just get all brokers create house
 // router.route("/all_broker_house").get(getAllBrokerHouse);
 router.get('/all_broker_house/:id', authenticate,(req, res, next) => {
-    // console.log('Role in route handler:', req.role);
-    if (req.role === 'user') {
+    if (req.role === 'broker') {
         getAllBrokerHouse(req, res, next);
     } else {
       return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });

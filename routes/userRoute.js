@@ -3,7 +3,6 @@ const express = require('express');
 const router = express.Router();
 const UserController = require('../controllers/userController');
 const UserAuthController = require('../controllers/userAuthController');
-const { validateUserRegistration } = require('../middlewares/userValidation');
 const authenticate = require('../middlewares/auth');
 const multer = require("multer")
 
@@ -31,7 +30,6 @@ router.post('/login', UserController.loginUser);
 // Create User Profile
 // router.post('/:id/profile', authenticate, upload.fields([{ name: 'image' }, { name: 'personal_id' }]), UserController.createUserProfile);
 router.post('/:id/profile', authenticate,upload.fields([{ name: 'image' }, { name: 'personal_id' }]),(req, res, next) => {
-  // console.log('Role in route handler:', req.role);
   if (req.role === 'user') {
     UserController.createUserProfile(req, res, next);
   } else {
@@ -44,7 +42,6 @@ router.get('/',authenticate, UserController.getAllUsers);
 
 //  get single users
 router.get('/:id', authenticate,(req, res, next) => {
-  // console.log('Role in route handler:', req.role);
   if (req.role === 'user') {
     UserController.getUser(req, res, next);
   } else {
@@ -74,7 +71,6 @@ router.delete('/:id', authenticate, UserController.deleteUser);
 // change activate status
 // router.post('/recommended_status_change/:id', UserController.recommendedStatus);
 router.post('/recommended_status_change/:id', authenticate,(req, res, next) => {
-  // console.log('Role in route handler:', req.role);
   if (req.role === 'user') {
     UserController.recommendedStatus(req, res, next);
   } else {
@@ -85,7 +81,6 @@ router.post('/recommended_status_change/:id', authenticate,(req, res, next) => {
 //change payment status
 // router.post("/change_payment_status/:userId", UserController.changePaymentStatus);
 router.post('/change_payment_status/:userId', authenticate,(req, res, next) => {
-  // console.log('Role in route handler:', req.role);
   if (req.role === 'user') {
     UserController.changePaymentStatus(req, res, next);
   } else {
@@ -95,8 +90,7 @@ router.post('/change_payment_status/:userId', authenticate,(req, res, next) => {
 
 //get user status
 // router.post("/getUser_status/:userId", UserController.getUserStatus);
-router.get('/getUser_status/:userId', authenticate,(req, res, next) => {
-  // console.log('Role in route handler:', req.role);
+router.get('/getUser_status/:userId', authenticate,(req, res, next) => {''
   if (req.role === 'user') {
     UserController.getUserStatus(req, res, next);
   } else {

@@ -144,10 +144,10 @@ exports.loginUser = async (req, res) => {
     const user = await User.getUserByUsername(username);
 
     // Check if the user is verified (1 = verified, 0 = not verified)
-    if (user.verified === 0) {
-      res.status(401).json({ message: 'User is not verified' });
-      return;
-    }
+    // if (user.verified === 0) {
+    //   res.status(401).json({ message: 'User is not verified' });
+    //   return;
+    // }
 
 
     if (!user) {
@@ -184,6 +184,7 @@ exports.loginUser = async (req, res) => {
 exports.createUserProfile = async (req, res) => {
   try {
     const userId = req.params.id;
+    const newUserId = userId;
     const { gender, religion, age, budget, image, personal_id, bio, phone_number, address, job_status, smoking, pets, privacy, religious_compatibility, socialize,fcm_token } = req.body;
     const files = req.files;
     if (!files || files.length === 0) {
@@ -277,30 +278,24 @@ exports.createUserProfile = async (req, res) => {
             await Similarity.create({ userId, similarityScores });
           }
 
-          //  Send notifications to existing users if they have similarity with the new user
-          // const newUserId = req.params.id;
-          // if (similarityScores[newUserId]) {
-          //   const otherUser = await User.findByPk(userId);
-          //   if (otherUser && otherUser.fcm_token) {
-          //     await sendPushNotification(otherUser.fcm_token, {
-          //       title: 'New Recommended User',
-          //       body: `A new user is recommended for you.`
-          //     });
-          //   }
-          // }
-
-          for (const [otherUserId, similarityScore] of Object.entries(similarityScores)) {
-            if (similarityScore > 0 && otherUserId == newUserId) {
-              const otherUser = await User.findByPk(userId);
-              if (otherUser && otherUser.fcm_token) {
-                await sendPushNotification(otherUser.fcm_token, {
-                  title: 'New Recommended User',
-                  body: `A new user is recommended for you.`
-                });
-              }
+        
+        }
+        
+        for (const score of similarityScores) {
+          const { userId, similarityScores } = score;
+  
+          // Check if the new user's ID is in the similarity scores
+          if (similarityScores[newUserId]) {
+            // Find the user corresponding to the user ID
+            const otherUser = await User.findByPk(userId);
+            if (otherUser && otherUser.fcm_token) {
+              // Send push notification to the user
+              await sendPushNotification(otherUser.fcm_token, {
+                title: 'New Recommended User',
+                body: `A new user is recommended for you.`
+              });
             }
           }
-        
         }
 
 
@@ -308,11 +303,11 @@ exports.createUserProfile = async (req, res) => {
         console.error('Error saving similarity scores:', error);
 
       }
+
+      
     }).catch(error => {
       console.log(error)
     })
-
-    // send notification
 
     
     res.status(200).json({

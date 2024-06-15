@@ -16,6 +16,6 @@ router.get('/preferenceList/:id', authenticate,(req, res, next) => {
   });
 
 // save similarity
-// router.post('/save', SimilarityController.saveSimilarity);
+router.post('/save', SimilarityController.saveSimilarity);
 
 module.exports = router;

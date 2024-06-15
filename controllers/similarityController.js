@@ -3,8 +3,35 @@ const UserProfile = require('../models/userModel');
 
 
 // save the similarity score with users
+// exports.saveSimilarity = async (req, res) => {
+//   // console.log("I am called")
+//   const similarityScores = req.body;
+
+//   try {
+//     for (const score of similarityScores) {
+//       const { userId, similarityScores } = score;
+
+//       // Check if the user already exists in the similarity table
+//       let existingUser = await Similarity.findOne({ where: { userId } });
+
+//       if (existingUser) {
+//         // User already exists, update the similarity scores
+//         existingUser.similarityScores = similarityScores;
+//         await existingUser.save();
+//       } else {
+//         // User does not exist, create a new record
+//         await Similarity.create({ userId, similarityScores });
+//       }
+//     }
+
+//     res.status(200).json({ message: 'Similarity scores saved and updated successfully.' });
+//   } catch (error) {
+//     console.error('Error saving similarity scores:', error);
+//     res.status(500).json({ message: 'An error occurred while saving similarity scores.', error: error.message });
+//   }
+// };
+
 exports.saveSimilarity = async (req, res) => {
-  // console.log("I am called")
   const similarityScores = req.body;
 
   try {
@@ -14,13 +41,21 @@ exports.saveSimilarity = async (req, res) => {
       // Check if the user already exists in the similarity table
       let existingUser = await Similarity.findOne({ where: { userId } });
 
-      if (existingUser) {
-        // User already exists, update the similarity scores
-        existingUser.similarityScores = similarityScores;
-        await existingUser.save();
-      } else {
-        // User does not exist, create a new record
-        await Similarity.create({ userId, similarityScores });
+      // Filter similarity scores to keep only those >= 40
+      const filteredScores = Object.fromEntries(
+        Object.entries(similarityScores).filter(([key, value]) => value >= 40)
+      );
+
+      // Update or create record only if there are valid similarity scores
+      if (Object.keys(filteredScores).length > 0) {
+        if (existingUser) {
+          // User already exists, update the similarity scores
+          existingUser.similarityScores = filteredScores;
+          await existingUser.save();
+        } else {
+          // User does not exist, create a new record
+          await Similarity.create({ userId, similarityScores: filteredScores });
+        }
       }
     }
 
@@ -30,6 +65,7 @@ exports.saveSimilarity = async (req, res) => {
     res.status(500).json({ message: 'An error occurred while saving similarity scores.', error: error.message });
   }
 };
+
 
 
 // get matched user profiles 

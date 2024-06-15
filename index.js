@@ -8,6 +8,8 @@ const associations = require("./models/association.js")
 const socketIo = require("socket.io")
 const http = require("http")
 const cors = require("cors")
+var serviceAccount = require('./config/serviceAccountKey.json');
+
 
 const userService = require('./services/userServices.js');
 // const multer = require('multer');
@@ -18,6 +20,14 @@ const io = socketIo(server, {
     origin: "*"
   }
 })
+// initialize firebase admin
+
+var serviceAccount = require('../config/serviceAccountKey.json');
+const certPath = admin.credential.cert(serviceAccount);
+admin.initializeApp({
+  credential: certPath
+});
+
 
 
 app.use(bodyParser.json());

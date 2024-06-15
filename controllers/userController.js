@@ -264,18 +264,25 @@ exports.createUserProfile = async (req, res) => {
         for (const score of similarityScores) {
           const { userId, similarityScores } = score;
 
-          // Check if the user already exists in the similarity table
-          let existingUser = await Similarity.findOne({ where: { userId } });
+      // Check if the user already exists in the similarity table
+      let existingUser = await Similarity.findOne({ where: { userId } });
 
-          if (existingUser) {
-            // User already exists, update the similarity scores
-            existingUser.similarityScores = similarityScores;
-            await existingUser.save();
-          } else {
-            // User does not exist, create a new record
-            await Similarity.create({ userId, similarityScores });
-          }
+      // Filter similarity scores to keep only those >= 40
+      const filteredScores = Object.fromEntries(
+        Object.entries(similarityScores).filter(([key, value]) => value >= 40)
+      );
 
+      // Update or create record only if there are valid similarity scores
+      if (Object.keys(filteredScores).length > 0) {
+        if (existingUser) {
+          // User already exists, update the similarity scores
+          existingUser.similarityScores = filteredScores;
+          await existingUser.save();
+        } else {
+          // User does not exist, create a new record
+          await Similarity.create({ userId, similarityScores: filteredScores });
+        }
+      }
         
         }
         

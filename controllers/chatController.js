@@ -3,14 +3,19 @@ const mysql = require("mysql2")
 const Chat = require("../models/chatModel")
 const { Op } = require("sequelize");
 const User = require('../models/userModel');
-
 require("dotenv").config()
+
+var admin = require("firebase-admin");
+
+
 
 
 // save the chat message
 async function saveChatData(req, res) {
     const { sender_id, receiver_id, message } = req.body;
     const status = 'delivered'; // Set default status as 'delivered'
+    // find receiver
+    let receiver = await User.findOne({ where: { receiver_id } });
   
     try {
       // Save the chat data to the database
@@ -20,6 +25,23 @@ async function saveChatData(req, res) {
         message,
         status
       });
+
+
+  // Find sender and receiver names for notification
+  let sender = await User.findByPk(sender_id);
+  let receiver = await User.findByPk(receiver_id);
+  
+  if (!sender || !receiver) {
+    return res.status(404).json({ error: 'Sender or Receiver not found' });
+  }
+
+  // Send push notification to the receiver if chat saved successfully
+  await sendPushNotification(receiver.fcm_token, {
+    title: `${sender.name}`, // Update title with sender's name
+    body: message // Use the chat message as the body
+  });
+
+
   
       return res.status(201).json({ message: 'chat saved  successfully' });
     } catch (error) {
@@ -27,6 +49,25 @@ async function saveChatData(req, res) {
       return res.status(500).json({ error: 'Internal server error' , error: error.message});
     }
 }
+
+// notification
+const sendPushNotification = async (fcmToken, message) => {
+  try {
+    let notificationMessage = {
+      notification: {
+        title: message.title,
+        body: message.body
+      },
+      
+      token: fcmToken
+    };
+
+    await admin.messaging().send(notificationMessage);
+    console.log('Notification sent successfully');
+  } catch (error) {
+    console.error('Error sending notification:', error);
+  }
+};
 
 // Retrieve the chat messages between a single user and a specific sender
 async function getSingleUserChat(req, res) {

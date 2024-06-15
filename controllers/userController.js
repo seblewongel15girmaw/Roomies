@@ -257,8 +257,6 @@ exports.createUserProfile = async (req, res) => {
 
     }
 
-    // console.log(userData)
-
     // 
     axios.post('http://127.0.0.1:5000/calculate', userData).then(async (response) => {
       const similarityScores = response.data['matches']
@@ -281,6 +279,8 @@ exports.createUserProfile = async (req, res) => {
         
         }
         
+
+        // check and send the notification
         for (const score of similarityScores) {
           const { userId, similarityScores } = score;
   
@@ -303,13 +303,10 @@ exports.createUserProfile = async (req, res) => {
         console.error('Error saving similarity scores:', error);
 
       }
-
       
     }).catch(error => {
       console.log(error)
     })
-
-    
     res.status(200).json({
       message: 'User profile created successfully',
       userData: userData

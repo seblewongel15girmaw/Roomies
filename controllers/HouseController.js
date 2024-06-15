@@ -33,9 +33,16 @@ const postHouse = async (req, res) => {
     );
     res.status(201).json({ "house": house, "images": createdImages })
   }
-  catch (err) {
-    console.log(err)
-  }
+  catch (error) {
+     // Handle validation errors
+     if (error.name === 'SequelizeValidationError') {
+      const errors = error.errors.map((err) => err.message);
+      return res.status(400).json({ errors });
+    }
+
+    console.error('Error registering guarantor:', error);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+}
 }
 
 

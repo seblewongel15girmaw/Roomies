@@ -6,7 +6,7 @@ const router = express.Router()
 const BrokerAuthController = require('../controllers/brokerAuthController');
 const authenticate = require('../middlewares/auth');
 
-const { validateBrokerRegistration } = require('../middlewares/brokerValidation');
+
 
 
 const storage = multer.diskStorage({

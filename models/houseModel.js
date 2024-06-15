@@ -12,18 +12,62 @@ const House = sequelize.define("House", {
   },
   location: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: false,
+    validate: {
+      notNull: {
+        msg: 'Location is required.'
+      },
+      notEmpty: {
+        msg: 'Location is must not be empty'
+      },
+    }
+
   },
   numberOfRoom: {
     type: DataTypes.INTEGER,
-    allowNull: false
+    allowNull: false,
+    validate: {
+      notNull: {
+        msg: 'Number of rooms is required.'
+      },
+      notEmpty: {
+        msg: 'Number of rooms is must not be empty'
+      },
+      isInt: {
+        msg: 'Number of rooms must be an integer.'
+      },
+      min: {
+        args: [1],
+        msg: 'Number of rooms must be at least 1.'
+      },
+      max: {
+        args: [10],
+        msg: 'Number of rooms cannot exceed 10.'
+      }
+    }
   },
   price: {
     type: DataTypes.FLOAT,
-    allowNull: false
+    allowNull: false,
+    validate: {
+      notNull: {
+        msg: 'Price is required.'
+      },
+      notEmpty: {
+        msg: 'Price is must not be empty'
+      },
+      isFloat: {
+        msg: 'Price must be a valid floating point number.'
+      },
+      min: {
+        args: [0],
+        msg: 'Price must be greater than or equal to 0.'
+      }
+    }
   },
   description: {
     type: DataTypes.STRING,
+    allowNull: true,
   },
   rental_status: {
     type: DataTypes.INTEGER,
@@ -45,6 +89,16 @@ const Image = sequelize.define('Image', {
   imageUrl: {
     type: DataTypes.STRING,
     allowNull: false,
+    validate: {
+      notNull: {
+        msg: 'Image is required'
+      },
+      notEmpty: {
+         msg: "Image cannot be empty." 
+        },
+ 
+      
+    }
   },
 });
 

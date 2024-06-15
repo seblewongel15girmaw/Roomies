@@ -30,7 +30,7 @@ const registerGuarantor = async (req, res) => {
       image_url = path.join(imagesDirectory, file.filename);
     }
     const guarantorData = {
-      user_id: id, // Assign user_id to the guarantor record
+      userId: id, // Assign user_id to the guarantor record
       full_name,
       personal_id: image_url,
       address,
@@ -38,10 +38,20 @@ const registerGuarantor = async (req, res) => {
       gender
     };
 
-    const guarantorID = await Guarantor.create(guarantorData);
+    const guarantor = await Guarantor.create(guarantorData);
 
-    res.status(201).json({ message: 'Guarantor registered successfully', guarantorID });
+    res.status(201).json({ message: 'Guarantor registered successfully', guarantor });
   } catch (error) {
+ // Handle validation errors
+    if (error.name === 'SequelizeValidationError') {
+      const errors = error.errors.map((err) => err.message);
+      return res.status(400).json({ errors });
+    }
+
+    // Handle unique constraint violation for phone_number
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      return res.status(409).json({ error: 'Phone number must be unique.' });
+    }
     console.error('Error registering guarantor:', error);
     res.status(500).json({ message: 'Internal server error', error: error.message });
   }

@@ -3,7 +3,7 @@ const { postHouse, editHouse, changeHouseStatus,deleteHouse, getAllHouses, getAl
 const {getAllBrokerHouse}= require("../controllers/brokerController")
 const multer = require("multer")
 const authenticate = require('../middlewares/auth');
-const validateHouseRegistration  = require('../middlewares/houseValidation');
+
 
 
 

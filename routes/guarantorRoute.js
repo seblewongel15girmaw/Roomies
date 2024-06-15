@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const guarantorController = require('../controllers/guarantorController');
-const { validateGuarantorRegistration } = require('../middlewares/guarantorValidation');
+
 const multer = require("multer")
 const authenticate = require('../middlewares/auth');
 
@@ -22,7 +22,7 @@ router.get('/', guarantorController.getAllGuarantor);
 
 // register guarantors
 // router.post('/register/:id',upload.single("guarantor_id"), guarantorController.registerGuarantor);
-router.post('/register/:id', authenticate,validateGuarantorRegistration,upload.single("guarantor_id"),(req, res, next) => {
+router.post('/register/:id', authenticate,upload.single("guarantor_id"),(req, res, next) => {
     // console.log('Role in route handler:', req.role);
     if (req.role === 'user') {
         guarantorController.registerGuarantor(req, res, next);
@@ -33,7 +33,7 @@ router.post('/register/:id', authenticate,validateGuarantorRegistration,upload.s
 
 // update guarantors
 // router.put('/:id', validateGuarantorRegistration, guarantorController.updateGuarantor);
-router.put('/:id', authenticate,validateGuarantorRegistration,(req, res, next) => {
+router.put('/:id', authenticate,(req, res, next) => {
     // console.log('Role in route handler:', req.role);
     if (req.role === 'user') {
         guarantorController.updateGuarantor(req, res, next);

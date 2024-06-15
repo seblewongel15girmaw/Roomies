@@ -22,6 +22,7 @@ const sessions = new Map(); // In-memory session storage
 // sign up broker
 async function signup(req, res) {
   const { full_name, phone_number1, phone_number2, password, address, gender, email } = req.body;
+  try {
 
   const files = req.files;
   if (!files || files.length <= 1) {
@@ -31,6 +32,7 @@ async function signup(req, res) {
 
   const imagePath1 = path.join(imagesDirectory, files["profile_pic"][0].filename);
   const imagePath2 = path.join(imagesDirectory, files["broker_personal_id"][0].filename)
+
 
   // Check if phone number is already registered
   const existingBroker = await Broker.findOne({ where: { phone_number1 } });
@@ -58,6 +60,20 @@ async function signup(req, res) {
     console.error('Error sending SMS:', error);
     res.status(500).json({ error: 'Error sending verification code' });
   }
+
+}
+catch (error) {
+    if (error.name === 'SequelizeValidationError') {
+      const errors = error.errors.map(err => ({
+        field: err.path,
+        message: err.message
+      }));
+      return res.status(400).json({ errors });
+    }
+    console.error('Error in signup:', error);
+    res.status(500).json({ error: 'Error during signup process' });
+  }
+
 }
 
 // verify users phone number

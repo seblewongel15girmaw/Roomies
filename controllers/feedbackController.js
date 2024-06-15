@@ -23,6 +23,12 @@ async function createFeedback(req, res) {
 
     res.status(201).json({ success: true, message: 'Feedback created successfully', data: feedback });
   } catch (error) {
+
+    // Handle validation errors
+    if (error.name === 'SequelizeValidationError') {
+      const errors = error.errors.map((err) => err.message);
+      return res.status(400).json({ errors });
+    }
     console.error(error);
     res.status(500).json({ success: false, error: error.message });
   }

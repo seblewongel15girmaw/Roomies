@@ -5,7 +5,7 @@ const { Op } = require("sequelize");
 const User = require('../models/userModel');
 require("dotenv").config()
 
-admin = require("firebase-admin");
+const admin = require("firebase-admin");
 
 
 // save the chat message
@@ -32,7 +32,6 @@ async function saveChatData(req, res) {
   if (!sender || !receiver) {
     return res.status(404).json({ error: 'Sender or Receiver not found' });
   }
-
   // Send push notification to the receiver if chat saved successfully
   await sendPushNotification(receiver.fcm_token, {
     title: `${sender.name}`, // Update title with sender's name
@@ -43,6 +42,15 @@ async function saveChatData(req, res) {
   
       return res.status(201).json({ message: 'chat saved  successfully' });
     } catch (error) {
+      
+      if (error.name === 'SequelizeValidationError') {
+        const errors = error.errors.map(err => ({
+          field: err.path,
+          message: err.message
+        }));
+        return res.status(400).json({ errors });
+      }
+
       console.error(error);
       return res.status(500).json({ error: 'Internal server error' , error: error.message});
     }

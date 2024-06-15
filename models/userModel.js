@@ -25,6 +25,9 @@ const User = sequelize.define('User', {
       notEmpty: {
         msg: 'username must not be empty'
       },
+      notNull: {
+        msg: 'username is required'
+      },
       len: {
         args: [3, 30],
         msg: 'Username must be between 3 and 30 characters long'
@@ -35,6 +38,7 @@ const User = sequelize.define('User', {
   email: {
     type: DataTypes.STRING,
     allowNull: false,
+    unique: true,
     validate: {
       notNull: {
         msg: 'Email is required'
@@ -51,8 +55,11 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false,
     validate: {
-      notEmpty: {
+      notNull: {
         msg: 'Password is required'
+      },
+      notEmpty: {
+        msg: 'Password is must not be empty'
       },
       len: {
         args: [8, 30],
@@ -135,6 +142,7 @@ const User = sequelize.define('User', {
   phone_number: {
     type: DataTypes.STRING,
     allowNull: true,
+    unique: true,
     validate: {
       len: {
         args: 13,

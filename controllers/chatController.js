@@ -5,9 +5,7 @@ const { Op } = require("sequelize");
 const User = require('../models/userModel');
 require("dotenv").config()
 
-var admin = require("firebase-admin");
-
-
+admin = require("firebase-admin");
 
 
 // save the chat message

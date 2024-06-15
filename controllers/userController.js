@@ -8,13 +8,13 @@ const { Sequelize, where } = require("sequelize")
 const path = require('path');
 const axios = require('axios')
 const imagesDirectory = path.join(__dirname, "..", 'images');
-var admin = require("firebase-admin");
+const admin = require("firebase-admin");
 
-var serviceAccount = require('../config/serviceAccountKey.json');
-const certPath = admin.credential.cert(serviceAccount);
-admin.initializeApp({
-  credential: certPath
-});
+// var serviceAccount = require('../config/serviceAccountKey.json');
+// const certPath = admin.credential.cert(serviceAccount);
+// admin.initializeApp({
+//   credential: certPath
+// });
 
 // user regustration with email verification
 exports.registerUser = async (req, res) => {

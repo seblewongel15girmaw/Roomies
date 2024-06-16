@@ -18,7 +18,14 @@ const storage = multer.diskStorage({
 const upload=multer({storage:storage})
 
 // get all guarantors
-router.get('/', guarantorController.getAllGuarantor);
+// router.get('/', guarantorController.getAllGuarantor);
+router.get('/', authenticate,(req, res, next) => {
+  if (req.role === 'admin') {
+    guarantorController.getAllGuarantor(req, res, next);
+  } else {
+    return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
+  }
+});
 
 // register guarantors
 // router.post('/register/:id',upload.single("guarantor_id"), guarantorController.registerGuarantor);

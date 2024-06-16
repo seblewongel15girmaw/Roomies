@@ -36,7 +36,7 @@ exports.registerUser = async (req, res) => {
 
     // Create the new user
     const user = await User.create({
-            full_name,
+      full_name,
       username,
       email,
       password: hashedPassword,
@@ -51,14 +51,28 @@ exports.registerUser = async (req, res) => {
 
 
     res.status(201).json({ message: 'User registered successfully, and verify your email' });
-  } catch (error) {
-
-    // Handle Sequelize-specific errors
+  } 
+  catch (error) {
+    // Handling specific types of errors
+  
+    // Bcrypt hashing errors
+    if (error.name === 'BcryptError' || error.message.includes('bcrypt hashing error')) {
+      console.error('Error hashing password:', error);
+      return res.status(500).json({ message: 'Error hashing password', error: error.message });
+    }
+  
+    // Sequelize validation errors
     if (error.name === 'SequelizeValidationError') {
       const errors = error.errors.map((err) => err.message);
       return res.status(400).json({ errors });
     }
-
+  
+    // Handle other Sequelize errors, e.g., unique constraint violations
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      return res.status(400).json({ message: 'Unique constraint violation', error: error.message });
+    }
+  
+    // Handle general server errors
     console.error('Error registering user:', error);
     res.status(500).json({ message: 'Internal server error', error: error.message });
   }
@@ -144,10 +158,10 @@ exports.loginUser = async (req, res) => {
     const user = await User.getUserByUsername(username);
 
     // Check if the user is verified (1 = verified, 0 = not verified)
-    // if (user.verified === 0) {
-    //   res.status(401).json({ message: 'User is not verified' });
-    //   return;
-    // }
+    if (user.verified === 0) {
+      res.status(401).json({ message: 'User is not verified' });
+      return;
+    }
 
 
     if (!user) {
@@ -269,7 +283,7 @@ exports.createUserProfile = async (req, res) => {
 
       // Filter similarity scores to keep only those >= 40
       const filteredScores = Object.fromEntries(
-        Object.entries(similarityScores).filter(([key, value]) => value >= 40)
+        Object.entries(similarityScores).filter(([key, value]) => value >= 50)
       );
 
       // Update or create record only if there are valid similarity scores

@@ -21,7 +21,7 @@ const authenticate = (req, res, next) => {
 
 
       // Proceed to the next middleware or route handler
-      if (req.role === 'broker' || req.role === 'user') {
+      if (req.role === 'broker' || req.role === 'user' || req.role === 'admin') {
         next();
       } else {
         res.status(403).json({ message: 'Forbidden: Invalid role' });

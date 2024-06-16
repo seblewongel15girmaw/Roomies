@@ -3,7 +3,7 @@ const cloudinary = require("cloudinary")
 const path = require("path")
 const imagesDirectory = path.join(__dirname, "..", 'images');
 const { Op } = require("sequelize")
-const { Sequelize } = require("sequelize")
+const { sequelize } = require("sequelize")
 const User = require("../models/userModel")
 
 // cloudinary.config({
@@ -184,17 +184,52 @@ const getAllUserBasedHouses = async (req, res) => {
          });
       res.json(houseList);
     } else {
-      // If the user's profile_status is 1, find houses within their budget
-      const budget = user.budget; // Assuming the user's budget is stored in the 'budget' field
+      // // If the user's profile_status is 1, find houses within their budget
+      // const budget = user.budget; // Assuming the user's budget is stored in the 'budget' field
+
+      // const houseList = await House.findAll({
+      //   where: {
+      //     price: {
+      //       [Op.lte]: budget, // Filter houses with price less than or equal to the user's budget
+      //     },
+      //     rental_status: 0, // Filter houses with rental_status 0
+      //   },
+      //   include: Image,
+      // });
+
+      // res.json(houseList);
+
+
+      // based on location house filter
+      // If the user's profile_status is 1, find houses within 3km of the user's location
+      const userLocation = JSON.parse(user.location); // Assuming the user's location is stored as a JSON string
+      const { lat: userLat, lon: userLon } = userLocation;
+      const budget = user.budget;
+      let budgetVariation = budget * 0.3;
 
       const houseList = await House.findAll({
         where: {
-          price: {
-            [Op.lte]: budget, // Filter houses with price less than or equal to the user's budget
+              price: {
+            [Op.lte]: budget + budgetVariation, // Filter houses with price less than or equal to the user's budget
           },
           rental_status: 0, // Filter houses with rental_status 0
         },
-        include: Image,
+        include: [
+          {
+            model: Image,
+            required: true, // Ensure the house has at least one image
+          },
+        ],
+        order: [
+          // Sort the houses by distance from the user's location
+          [
+            sequelize.literal(
+              `(6371 * acos(cos(radians(${userLat})) * cos(radians(lat)) * cos(radians(lon) - radians(${userLon})) + sin(radians(${userLat})) * sin(radians(lat))))`
+            ),
+            'ASC',
+          ],
+        ],
+        
       });
 
       res.json(houseList);

@@ -12,8 +12,7 @@ const admin = require("firebase-admin");
 async function saveChatData(req, res) {
     const { sender_id, receiver_id, message } = req.body;
     const status = 'delivered'; // Set default status as 'delivered'
-    // find receiver
-    let receiver = await User.findOne({ where: { receiver_id } });
+    
   
     try {
       // Save the chat data to the database

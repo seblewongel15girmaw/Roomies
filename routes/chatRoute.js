@@ -38,5 +38,4 @@ router.get('/:sender_id', authenticate,(req, res, next) => {
   });
 
 
-
 module.exports = router;

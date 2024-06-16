@@ -111,8 +111,8 @@ const deleteHouse = async (req, res) => {
 
     // Delete the house and associated images
     await house.destroy();
+    res.status(201).json('deleted successfully')
 
-    res.json("success")
 
   }
   catch (err) {
@@ -287,23 +287,7 @@ const getHousesBasedOnRooms = async (req, res) => {
   }
 };
 
-/* const searchHouse = async (req, res) => {
-    const { brokerId } = req.user
-    const { location } = re.query
-    try {
-        const house = await House.findAll({
-            where: {
-                brokerId: brokerId,
-                location:
-                    { [Op.iLike]: `%${location}%` }
-            }
-        })
-        res.json(house)
-    }
-    catch (err) {
-        res.json(err)
-    }
-} */
+
 
 module.exports = { postHouse, editHouse, changeHouseStatus,deleteHouse, viewSingleHouse, getAllHouses, getHousesBasedOnRooms, getAllUserBasedHouses }
 

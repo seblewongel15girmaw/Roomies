@@ -113,7 +113,7 @@ router.post('/forget-password', UserAuthController.sendGeneratedPassword);
 router.post('/change-password/:id', authenticate,(req, res, next) => {
   // console.log('Role in route handler:', req.role);
   if (req.role === 'user') {
-    UserController.changePassword(req, res, next);
+    UserAuthController.changePassword(req, res, next);
   } else {
     return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
   }

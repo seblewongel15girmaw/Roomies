@@ -48,14 +48,14 @@ router.post('/house_status/:id', authenticate,(req, res, next) => {
 
 // edit house
 // router.route("/edithouse").put(editHouse)
-router.put('/edithouse/:id', authenticate,(req, res, next) => {
-    // console.log('Role in route handler:', req.role);
-    if (req.role === 'broker') {
-        editHouse(req, res, next);
-    } else {
-      return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
-    }
-  });
+router.put('/edithouse/:id', authenticate, upload.array("images", 6), (req, res, next) => {
+  // Ensure user is authorized (role check)
+  if (req.role === 'broker') {
+    editHouse(req, res, next); // Call the controller function to handle the edit
+  } else {
+    return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
+  }
+});
 
 // delete house 
 // router.route("/deletehouse/:id").delete(deleteHouse)

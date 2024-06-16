@@ -77,24 +77,49 @@ const changeHouseStatus = async (req, res) => {
 
 // edit house
 const editHouse = async (req, res) => {
+  const { id } = req.params; // Extract house ID from request parameters
+  const { location, price, description, numberOfRoom } = req.body; // Extract updated house details from request body
+  const files = req.files; // Uploaded files (if any)
+
   try {
-    const { houseId } = req.params
-    const { numberOfRoom, description } = req.body
-    const isValid = checkOwnership(houseId)
-    if (isValid == false) {
-      return res.json("unauthorized access")
+    // Check if files are missing
+    if (!files || files.length === 0) {
+      return res.status(400).send("Files are missing");
     }
-    isValid.numberOfRoom = numberOfRoom
-    isValid.description = description
-    await isValid.save()
-    res.json(isValid)
 
-  }
-  catch (err) {
-    console.log(err)
-  }
+    // Update the house details in the database
+    const updatedHouse = await House.findByPk(id); // Find the house by its primary key (id)
+    
+    // Handle if the house with the given id does not exist
+    if (!updatedHouse) {
+      return res.status(404).json({ message: 'House not found' });
+    }
 
-}
+    // Perform the update
+    updatedHouse.location = location;
+    updatedHouse.price = price;
+    updatedHouse.description = description;
+    updatedHouse.numberOfRoom = numberOfRoom;
+    
+    // Save the updated house details
+    await updatedHouse.save();
+
+    // Update or add images
+    const imagePaths = req.files.map(file => path.join(imagesDirectory, file.filename)); // Assuming imagesDirectory is defined
+    const updatedImages = await Promise.all(
+      imagePaths.map(imageUrl => Image.create({ imageUrl, houseId: updatedHouse.houseId }))
+    );
+
+    // Respond with updated house and images
+    // res.json({ house: updatedHouse, images: updatedImages });
+    res.status(201).json({ house: updatedHouse, images: updatedImages });
+  } catch (error) {
+    // Handle errors
+    console.error('Error editing house:', error);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+};
+
 
 // delete house
 const deleteHouse = async (req, res) => {

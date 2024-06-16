@@ -83,7 +83,6 @@ const sendVerificationEmail = async (req, email,verificationToken) => {
   try {
   
 
-    console.log("hell");
     // Define the email template
     const emailTemplate = `
       <html>
@@ -108,7 +107,8 @@ const sendVerificationEmail = async (req, email,verificationToken) => {
     
     // Send the email
     await transporter.sendMail(mailOptions);
-    console.log("hell00");
+    console.log('email sent succesfully');
+   
   } catch (error) {
     console.error('Error sending verification email:', error);
     throw error;
@@ -179,6 +179,7 @@ exports.loginUser = async (req, res) => {
 
     // Compare the hashed password
     const isMatch = await bcrypt.compare(password, user.password);
+    
 
     if (!isMatch) {
       res.status(401).json({ message: 'Invalid username or password' });

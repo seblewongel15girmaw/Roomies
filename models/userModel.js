@@ -61,6 +61,7 @@ const User = sequelize.define('User', {
       notEmpty: {
         msg: 'Password is must not be empty'
       },
+     
       
       
     }
@@ -119,6 +120,7 @@ const User = sequelize.define('User', {
   bio: {
     type: DataTypes.TEXT,
     allowNull: true,
+    
    
   },
   phone_number: {

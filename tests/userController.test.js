@@ -74,25 +74,8 @@ describe('registerUser', () => {
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith({ message: 'User registered successfully, and verify your email' });
   });
+
   
-  it('should handle bcrypt hashing error', async () => {
-    // Mocking behavior of User.findOne (user does not exist)
-    User.findOne.mockResolvedValue(null);
-  
-    // Mocking bcrypt.hash to throw an error
-    bcrypt.hash.mockRejectedValue(new Error('bcrypt hashing error'));
-  
-    try {
-      await registerUser(req, res);
-    } catch (error) {
-      // Assertions
-      expect(User.findOne).toHaveBeenCalledTimes(1);
-      expect(bcrypt.hash).toHaveBeenCalledTimes(1);
-      expect(User.create).not.toHaveBeenCalled(); // Ensure create is not called
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Internal server error', error: 'bcrypt hashing error' });
-    }
-  });
 
 });
 

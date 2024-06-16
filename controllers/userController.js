@@ -82,6 +82,8 @@ exports.registerUser = async (req, res) => {
 const sendVerificationEmail = async (req, email,verificationToken) => {
   try {
   
+
+    console.log("hell");
     // Define the email template
     const emailTemplate = `
       <html>
@@ -103,9 +105,10 @@ const sendVerificationEmail = async (req, email,verificationToken) => {
       subject: 'Verify your email',
       html: emailTemplate
     };
-
+    
     // Send the email
     await transporter.sendMail(mailOptions);
+    console.log("hell00");
   } catch (error) {
     console.error('Error sending verification email:', error);
     throw error;
@@ -156,6 +159,11 @@ exports.loginUser = async (req, res) => {
 
     // Retrieve the user from the database
     const user = await User.getUserByUsername(username);
+
+    // Check if the user exists
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid username or password' });
+    }
 
     // Check if the user is verified (1 = verified, 0 = not verified)
     if (user.verified === 0) {

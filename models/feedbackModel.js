@@ -42,8 +42,8 @@ const Feedback = sequelize.define("Feedback", {
         msg: 'Feedback message must not be empty'
       },
       len: {
-        args: [1, 255], // Minimum and maximum length of feedback message
-        msg: 'Feedback message must be between 1 and 255 characters'
+        args: [1, 400], // Minimum and maximum length of feedback message
+        msg: 'Its to long'
       }
     }
   },

@@ -61,10 +61,7 @@ const User = sequelize.define('User', {
       notEmpty: {
         msg: 'Password is must not be empty'
       },
-      len: {
-        args: [8, 30],
-        msg: 'Password must be atleast 8 charcters long'
-      },
+      
       
     }
   },
@@ -99,7 +96,7 @@ const User = sequelize.define('User', {
     type: DataTypes.INTEGER,
     allowNull: true,
     validate: {
-      optional: true,
+  
       isInt: {
         msg: 'Budget must be an integer'
       },
@@ -112,32 +109,17 @@ const User = sequelize.define('User', {
   image: {
     type: DataTypes.STRING,
     allowNull: true,
-    validate: {
-      optional: true,
-      isString: {
-        msg: 'Image must be a string'
-      }
-    }
+   
   },
   personal_id: {
     type: DataTypes.STRING,
     allowNull: true,
-    validate: {
-      optional: true,
-      isString: {
-        msg: 'Personal ID must be a string'
-      }
-    }
+   
   },
   bio: {
     type: DataTypes.TEXT,
     allowNull: true,
-    validate: {
-      optional: true,
-      isString: {
-        msg: 'Bio must be a string'
-      }
-    }
+   
   },
   phone_number: {
     type: DataTypes.STRING,
@@ -145,7 +127,7 @@ const User = sequelize.define('User', {
     unique: true,
     validate: {
       len: {
-        args: 13,
+        args: 10,
         msg: 'Phone number must be 13 characters long'
       },
       
@@ -158,62 +140,32 @@ const User = sequelize.define('User', {
   job_status: {
     type: DataTypes.STRING,
     allowNull: true,
-    validate: {
-      optional: true,
-      isString: {
-        msg: 'job_status must be a string'
-      }
-    }
+   
   },
   smoking: {
     type: DataTypes.STRING,
     allowNull: true,
-    validate: {
-      optional: true,
-      isString: {
-        msg: 'smoking must be a string'
-      }
-    }
+   
   },
   pets: {
     type: DataTypes.STRING,
     allowNull: true,
-    validate: {
-      optional: true,
-      isString: {
-        msg: 'pets must be a string'
-      }
-    }
+   
   },
   privacy: {
     type: DataTypes.STRING,
     allowNull: true,
-    validate: {
-      optional: true,
-      isString: {
-        msg: 'privacy must be a string'
-      }
-    }
+   
   },
   religious_compatibility: {
     type: DataTypes.STRING,
     allowNull: true,
-    validate: {
-      optional: true,
-      isString: {
-        msg: 'religious_compatibility must be a string'
-      }
-    }
+   
   },
   socialize: {
     type: DataTypes.STRING,
     allowNull: true,
-    validate: {
-      optional: true,
-      isString: {
-        msg: 'socialize must be a string'
-      }
-    }
+    
   },
   verified: {
     type: DataTypes.INTEGER,

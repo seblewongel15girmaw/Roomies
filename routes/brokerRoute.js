@@ -61,7 +61,7 @@ router.post('/forget_password', authenticate, BrokerAuthController.sendGenerated
 // router.post('/change_password/:id',authenticate, BrokerAuthController.changePassword);
 router.post('/change_password/:id', authenticate,(req, res, next) => {
     // console.log('Role in route handler:', req.role);
-    if (req.role === 'user') {
+    if (req.role === 'broker') {
         BrokerAuthController.changePassword(req, res, next);
     } else {
       return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });

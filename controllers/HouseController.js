@@ -284,7 +284,7 @@ const getAllUserBasedHouses = async (req, res) => {
   try {
     const userId = req.params.id;
     const user = await User.findByPk(userId);
-    console.log('user:', user);
+    // console.log('user:', user);
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -300,7 +300,7 @@ const getAllUserBasedHouses = async (req, res) => {
       return res.json(houseList);
     } else {
       // const address = '{"display_name":"Lafto, Lafto Condominiums, ላፍቶ, Nefas Silk, አዲስ አበባ / Addis Ababa, አዲስ አበባ, 0006, ኢትዮጵያ","lat":8.95,"lon":38.75}';
-      const userAddress = JSON.parse(address);
+      const userAddress = JSON.parse(user.address);
 
       console.log('Lat:', userAddress.lat);
       console.log('Lon:', userAddress.lon);

@@ -55,7 +55,7 @@ router.put('/editProfile/:id', authenticate,(req, res, next) => {
 
 
 // forget password
-router.post('/forget_password', authenticate, BrokerAuthController.sendGeneratedPassword);
+router.post('/forget_password', BrokerAuthController.sendGeneratedPassword);
 
 // change passwor
 // router.post('/change_password/:id',authenticate, BrokerAuthController.changePassword);

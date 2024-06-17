@@ -192,24 +192,7 @@ const getAllHouses = async (req, res) => {
   }
 }
 
-
-// get all house based on user status  
-const getAllUserBasedHouses = async (req, res) => {
-  try {
-    const userId = req.params.id; // Get the user ID from the route parameter
-    const user = await User.findByPk(userId);
-
-    if (user.profile_status === 0) {
-      // If the user's profile_status is 0, fetch all the houses
-      const houseList = await House.findAll({
-        where: {
-          rental_status: 0,
-        },
-         include: Image
-         });
-      res.json(houseList);
-    } else {
-      // // If the user's profile_status is 1, find houses within their budget
+// // If the user's profile_status is 1, find houses within their budget
       // const budget = user.budget; // Assuming the user's budget is stored in the 'budget' field
 
       // const houseList = await House.findAll({
@@ -224,29 +207,46 @@ const getAllUserBasedHouses = async (req, res) => {
 
       // res.json(houseList);
 
+// get all house based on user status  
+const getAllUserBasedHouses = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findByPk(userId);
 
-      // based on location house filter
-      // If the user's profile_status is 1, find houses within 3km of the user's location
-      const userLocation = JSON.parse(user.location); // Assuming the user's location is stored as a JSON string
-      const { lat: userLat, lon: userLon } = userLocation;
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (user.profile_status === 0) {
+      const houseList = await House.findAll({
+        where: {
+          rental_status: 0,
+        },
+        include: Image,
+      });
+      return res.json(houseList);
+    } else {
+      // Parse user location data directly from user.location
+      const userLocationData = JSON.parse(user.location); // No need to parse, as it's already JSON
+      const userLat = userLocationData.lat;
+      const userLon = userLocationData.lon;
       const budget = user.budget;
       let budgetVariation = budget * 0.3;
 
       const houseList = await House.findAll({
         where: {
-              price: {
-            [Op.lte]: budget + budgetVariation, // Filter houses with price less than or equal to the user's budget
+          price: {
+            [Op.lte]: budget + budgetVariation,
           },
-          rental_status: 0, // Filter houses with rental_status 0
+          rental_status: 0,
         },
         include: [
           {
             model: Image,
-            required: true, // Ensure the house has at least one image
+            required: true,
           },
         ],
         order: [
-          // Sort the houses by distance from the user's location
           [
             sequelize.literal(
               `(6371 * acos(cos(radians(${userLat})) * cos(radians(lat)) * cos(radians(lon) - radians(${userLon})) + sin(radians(${userLat})) * sin(radians(lat))))`
@@ -254,16 +254,17 @@ const getAllUserBasedHouses = async (req, res) => {
             'ASC',
           ],
         ],
-        
       });
 
-      res.json(houseList);
+      return res.json(houseList);
     }
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: 'An error occurred while fetching houses.' });
+    console.error('Error fetching houses:', err); // Log the actual error for debugging
+    return res.status(500).json({ message: 'An error occurred while fetching houses.' });
   }
 };
+
+
 
 //   get house based on number of rooms
 

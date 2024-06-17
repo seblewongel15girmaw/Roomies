@@ -9,7 +9,7 @@ const Feedback = sequelize.define("Feedback", {
   },
 
   rating: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.DECIMAL(3, 2),
     allowNull: false,
     validate: {
       notNull: {
@@ -18,16 +18,16 @@ const Feedback = sequelize.define("Feedback", {
       notEmpty: {
         msg: 'Rating must not be empty'
       },
-      isInt: {
-        msg: 'Rating must be an integer'
+      isDecimal: {
+        msg: ' rating must be a decimal number'
       },
       min: {
-        args: [1], // Minimum value allowed for rating
-        msg: 'Rating must be at least 1'
+        args: [1.0], // Minimum value allowed for double rating
+        msg: 'Double rating must be at least 1.0'
       },
       max: {
-        args: [5], // Maximum value allowed for rating
-        msg: 'Rating must be at most 5'
+        args: [5.0], // Maximum value allowed for double rating
+        msg: 'Double rating must be at most 5.0'
       }
     }
   },

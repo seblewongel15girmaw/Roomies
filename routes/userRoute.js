@@ -38,14 +38,14 @@ router.post('/:id/profile', authenticate,upload.fields([{ name: 'image' }, { nam
 });
 
 // Get All Users
-// router.get('/', UserController.getAllUsers);
-router.get('/', authenticate,(req, res, next) => {
-  if (req.role === 'admin') {
-    UserController.getAllUsers(req, res, next);
-  } else {
-    return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
-  }
-});
+router.get('/', UserController.getAllUsers);
+// router.get('/', authenticate,(req, res, next) => {
+//   if (req.role === 'admin') {
+//     UserController.getAllUsers(req, res, next);
+//   } else {
+//     return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
+//   }
+// });
 
 //  get single users
 router.get('/:id', authenticate,(req, res, next) => {

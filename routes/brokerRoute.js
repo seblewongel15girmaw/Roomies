@@ -29,7 +29,7 @@ router.route("/verify").post(verify)
 router.route("/login").post(signIn)
 
 // get all brokers
-router.route("/").get(authenticate,getAllBrokers);
+router.route("/").get(getAllBrokers);
 
 // viewProfile 
 // router.route("/getProfile/:id").get(authenticate, viewProfile)

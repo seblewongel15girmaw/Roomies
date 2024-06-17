@@ -452,14 +452,18 @@ const getHousesBasedOnRooms = async (req, res) => {
       res.json(houseList);
     } else {
       // If the user's profile_status is 1, find houses that match either the budget or the number of rooms
-      const budget = user.budget; // Assuming the user's budget is stored in the 'budget' field
+      // const budget = user.budget; // Assuming the user's budget is stored in the 'budget' field
+
+      const userAddress = JSON.parse(user.address);
+
+      const budgetVariation = 0.3 * user.budget;
 
       const houseList = await House.findAll({
         where: {
           [Op.and]: [
             {
               price: {
-                [Op.lte]: budget, // Filter houses with price less than or equal to the user's budget
+                [Op.lte]: user.budget + budgetVariation, // Filter houses with price less than or equal to the user's budget
               },
             },
             {
@@ -468,7 +472,23 @@ const getHousesBasedOnRooms = async (req, res) => {
             },
           ],
         },
-        include: Image,
+        include: [
+          {
+            model: Image,
+            required: true,
+          },
+        ],
+        order: sequelize.literal(`
+          (
+            6371 * acos(
+              cos(radians(${userAddress.lat})) * 
+              cos(radians(cast(JSON_EXTRACT(House.location, '$.lat') as decimal))) *
+              cos(radians(cast(JSON_EXTRACT(House.location, '$.lon') as decimal)) - radians(${userAddress.lon})) +
+              sin(radians(${userAddress.lat})) *
+              sin(radians(cast(JSON_EXTRACT(House.location, '$.lat') as decimal)))
+            )
+          )
+        `),
       });
       console.log(houseList);
       res.json(houseList);

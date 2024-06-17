@@ -268,8 +268,8 @@ const getAllBrokerHouse = async (req, res) => {
 // view  brokers profile
 const viewProfile = async (req, res) => {
   try {
-    const { brokerId } = req.user
-    const brokerProfile = await BrokerProfile.findOne({ brokerId: brokerId })
+    const  brokerId  = req.parm.id
+    const brokerProfile = await Broker.findOne({ brokerId: brokerId })
     res.json(brokerProfile)
   }
   catch (err) {

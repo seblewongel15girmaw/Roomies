@@ -35,11 +35,9 @@ router.route("/").get(getAllBrokers);
 // router.route("/getProfile/:id").get(authenticate, viewProfile)
 router.get('/getProfile/:id', authenticate,(req, res, next) => {
     // console.log('Role in route handler:', req.role);
-    if (req.role === 'broker') {
+   
       viewProfile(req, res, next);
-    } else {
-      return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
-    }
+   
   });
 
 // edit profile

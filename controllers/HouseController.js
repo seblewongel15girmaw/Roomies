@@ -3,7 +3,8 @@ const cloudinary = require("cloudinary")
 const path = require("path")
 const imagesDirectory = path.join(__dirname, "..", 'images');
 const { Op } = require("sequelize")
-const { sequelize } = require("sequelize")
+// const { sequelize } = require("sequelize")
+const sequelize = require('../config/dbConfig');
 const User = require("../models/userModel")
 
 // cloudinary.config({
@@ -208,10 +209,82 @@ const getAllHouses = async (req, res) => {
       // res.json(houseList);
 
 // get all house based on user status  
+// const getAllUserBasedHouses = async (req, res) => {
+//   try {
+//     const userId = req.params.id;
+//     const user = await User.findByPk(userId);
+//     console.log('user:', user);
+
+//     if (!user) {
+//       return res.status(404).json({ message: 'User not found' });
+//     }
+
+//     if (user.profile_status === 0) {
+//       const houseList = await House.findAll({
+//         where: {
+//           rental_status: 0,
+//         },
+//         include: Image,
+//       });
+//       return res.json(houseList);
+//     } else {
+   
+// const address = '{"display_name":"Lafto, Lafto Condominiums, ላፍቶ, Nefas Silk, አዲስ አበባ / Addis Ababa, አዲስ አበባ, 0006, ኢትዮጵያ","lat":8.95,"lon":38.75}';
+//       const Paddress = JSON.parse(address);
+
+//       console.log('lan1:',Paddress.lat)
+//       console.log('lon1:',Paddress.lon)
+
+
+      
+
+      
+//       const budgetVariation = 0.3 * user.budget;
+
+//       const houseList = await House.findAll({
+//         where: {
+//           price: {
+//             [Op.lte]: user.budget + budgetVariation,
+//           },
+//           rental_status: 0,
+//         },
+//         include: [
+//           {
+//             model: Image,
+//             required: true,
+//           },
+//         ],
+//         order: [
+//           [
+//             sequelize.literal(`
+//             (6371 * acos(
+//               cos(radians(${Paddress.lat})) * cos(radians(lat)) * cos(radians(lon) - radians(${Paddress.lon})) +
+//               sin(radians(${Paddress.lat})) * sin(radians(lat))
+//             ))
+//           `),
+//             'ASC',
+//           ],
+//         ],
+//       });
+
+//       return res.json(houseList);
+//     }
+//   } catch (err) {
+//     console.error('Error fetching houses:', err);
+//     return res.status(500).json({
+//       error: {
+//         code: 500,
+//         message: 'An error occurred while fetching houses.',
+//         details: err.message,
+//       },
+//     });
+//   }
+// };
 const getAllUserBasedHouses = async (req, res) => {
   try {
     const userId = req.params.id;
     const user = await User.findByPk(userId);
+    console.log('user:', user);
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -222,21 +295,22 @@ const getAllUserBasedHouses = async (req, res) => {
         where: {
           rental_status: 0,
         },
-        include: Image,
+        include: [Image],
       });
       return res.json(houseList);
     } else {
-      // Parse user location data directly from user.location
-      const userLocationData = JSON.parse(user.location); // No need to parse, as it's already JSON
-      const userLat = userLocationData.lat;
-      const userLon = userLocationData.lon;
-      const budget = user.budget;
-      let budgetVariation = budget * 0.3;
+      // const address = '{"display_name":"Lafto, Lafto Condominiums, ላፍቶ, Nefas Silk, አዲስ አበባ / Addis Ababa, አዲስ አበባ, 0006, ኢትዮጵያ","lat":8.95,"lon":38.75}';
+      const userAddress = JSON.parse(address);
+
+      console.log('Lat:', userAddress.lat);
+      console.log('Lon:', userAddress.lon);
+
+      const budgetVariation = 0.3 * user.budget;
 
       const houseList = await House.findAll({
         where: {
           price: {
-            [Op.lte]: budget + budgetVariation,
+            [Op.lte]: user.budget + budgetVariation,
           },
           rental_status: 0,
         },
@@ -246,23 +320,33 @@ const getAllUserBasedHouses = async (req, res) => {
             required: true,
           },
         ],
-        order: [
-          [
-            sequelize.literal(
-              `(6371 * acos(cos(radians(${userLat})) * cos(radians(lat)) * cos(radians(lon) - radians(${userLon})) + sin(radians(${userLat})) * sin(radians(lat))))`
-            ),
-            'ASC',
-          ],
-        ],
+        order: sequelize.literal(`
+        (
+          6371 * acos(
+            cos(radians(${userAddress.lat})) * 
+            cos(radians(cast(JSON_EXTRACT(House.location, '$.lat') as decimal))) *
+            cos(radians(cast(JSON_EXTRACT(House.location, '$.lon') as decimal)) - radians(${userAddress.lon})) +
+            sin(radians(${userAddress.lat})) *
+            sin(radians(cast(JSON_EXTRACT(House.location, '$.lat') as decimal)))
+          )
+        )
+      `),
       });
 
       return res.json(houseList);
     }
   } catch (err) {
-    console.error('Error fetching houses:', err); // Log the actual error for debugging
-    return res.status(500).json({ message: 'An error occurred while fetching houses.' });
+    console.error('Error fetching houses:', err);
+    return res.status(500).json({
+      error: {
+        code: 500,
+        message: 'An error occurred while fetching houses.',
+        details: err.message,
+      },
+    });
   }
 };
+
 
 
 

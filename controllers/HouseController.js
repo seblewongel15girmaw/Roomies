@@ -7,11 +7,6 @@ const { Op } = require("sequelize")
 const sequelize = require('../config/dbConfig');
 const User = require("../models/userModel")
 
-// cloudinary.config({
-//     cloud_name: "dqdhs44nq",
-//     api_key: "544857432499217",
-//     api_secret: "MYbbMctHshdYR_3ELvkDpJLQx8o"
-// })
 
 // post new house
 const postHouse = async (req, res) => {
@@ -77,6 +72,51 @@ const changeHouseStatus = async (req, res) => {
 };
 
 // edit house
+// const editHouse = async (req, res) => {
+//   const { id } = req.params; // Extract house ID from request parameters
+//   const { location, price, description, numberOfRoom } = req.body; // Extract updated house details from request body
+//   const files = req.files; // Uploaded files (if any)
+
+//   try {
+//     // Check if files are missing
+//     if (!files || files.length === 0) {
+//       return res.status(400).send("Files are missing");
+//     }
+
+//     // Update the house details in the database
+//     const updatedHouse = await House.findByPk(id); // Find the house by its primary key (id)
+    
+//     // Handle if the house with the given id does not exist
+//     if (!updatedHouse) {
+//       return res.status(404).json({ message: 'House not found' });
+//     }
+
+//     // Perform the update
+//     updatedHouse.location = location;
+//     updatedHouse.price = price;
+//     updatedHouse.description = description;
+//     updatedHouse.numberOfRoom = numberOfRoom;
+    
+//     // Save the updated house details
+//     await updatedHouse.save();
+
+//     // Update or add images
+//     const imagePaths = req.files.map(file => path.join(imagesDirectory, file.filename)); // Assuming imagesDirectory is defined
+//     const updatedImages = await Promise.all(
+//       imagePaths.map(imageUrl => Image.create({ imageUrl, houseId: updatedHouse.houseId }))
+//     );
+
+//     // Respond with updated house and images
+//     // res.json({ house: updatedHouse, images: updatedImages });
+//     res.status(201).json({ house: updatedHouse, images: updatedImages });
+//   } catch (error) {
+//     // Handle errors
+//     console.error('Error editing house:', error);
+//     res.status(500).json({ message: 'Internal server error', error: error.message });
+//   }
+// };
+
+// new edit house 
 const editHouse = async (req, res) => {
   const { id } = req.params; // Extract house ID from request parameters
   const { location, price, description, numberOfRoom } = req.body; // Extract updated house details from request body
@@ -107,13 +147,29 @@ const editHouse = async (req, res) => {
 
     // Update or add images
     const imagePaths = req.files.map(file => path.join(imagesDirectory, file.filename)); // Assuming imagesDirectory is defined
-    const updatedImages = await Promise.all(
-      imagePaths.map(imageUrl => Image.create({ imageUrl, houseId: updatedHouse.houseId }))
+    const existingImages = await Image.findAll({ where: { houseId: updatedHouse.houseId } });
+
+    // Create new images
+    const newImages = await Promise.all(
+      imagePaths
+        .filter(imageUrl => !existingImages.some(img => img.imageUrl === imageUrl))
+        .map(imageUrl => Image.create({ imageUrl, houseId: updatedHouse.houseId }))
+    );
+
+    // Update existing images
+    await Promise.all(
+      existingImages.map(async img => {
+        if (imagePaths.includes(img.imageUrl)) {
+          return img.save(); // Save the existing image to update the timestamp
+        } else {
+          return img.destroy(); // Delete the image that's no longer needed
+        }
+      })
     );
 
     // Respond with updated house and images
-    // res.json({ house: updatedHouse, images: updatedImages });
-    res.status(201).json({ house: updatedHouse, images: updatedImages });
+    const allImages = [...existingImages, ...newImages];
+    res.status(201).json({ house: updatedHouse, images: allImages });
   } catch (error) {
     // Handle errors
     console.error('Error editing house:', error);
@@ -123,29 +179,55 @@ const editHouse = async (req, res) => {
 
 
 // delete house
+// const deleteHouse = async (req, res) => {
+//   try {
+//     const { id } = req.params
+//     // const isValid = checkOwnership(houseId)
+//     // if (!isValid) {
+//     //   return res.json("unauthorized access")
+//     // }
+
+//     const house = await House.findByPk(id, {
+//       include: Image
+//     });
+
+//     // Delete the house and associated images
+//     await house.destroy();
+//     res.status(201).json('deleted successfully')
+
+
+//   }
+//   catch (err) {
+//     console.log(err)
+//   }
+
+// }
+
+
+// new delete house code
 const deleteHouse = async (req, res) => {
   try {
-    const { id } = req.params
-    // const isValid = checkOwnership(houseId)
-    // if (!isValid) {
-    //   return res.json("unauthorized access")
-    // }
+    const { id } = req.params;
 
+    // Find the house and associated images
     const house = await House.findByPk(id, {
       include: Image
     });
 
-    // Delete the house and associated images
+    // Delete the associated images first
+    if (house.Images.length > 0) {
+      await Promise.all(house.Images.map(image => image.destroy()));
+    }
+
+    // Then delete the house
     await house.destroy();
-    res.status(201).json('deleted successfully')
 
-
+    res.status(201).json('deleted successfully');
+  } catch (err) {
+    console.log(err);
+    res.status(500).json('Error deleting house');
   }
-  catch (err) {
-    console.log(err)
-  }
-
-}
+};
 
 // check ownership for house
 const checkOwnership = async (houseId) => {

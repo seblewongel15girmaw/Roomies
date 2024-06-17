@@ -17,13 +17,13 @@ router.post('/add-feedback/:user_id', authenticate,(req, res, next) => {
   });
 
 // get all feedbacks
-// router.get('/', feedbackController.getAllFeedbacks);
-router.post('/', authenticate,(req, res, next) => {
+router.get('/', feedbackController.getAllFeedbacks);
+// router.post('/', authenticate,(req, res, next) => {
     
-  if (req.role === 'admin') {
-      feedbackController.getAllFeedbacks(req, res, next);
-  } else {
-    return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
-  }
-});
+//   if (req.role === 'admin') {
+//       feedbackController.getAllFeedbacks(req, res, next);
+//   } else {
+//     return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
+//   }
+// });
 module.exports = router;
